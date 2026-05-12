@@ -1,0 +1,32 @@
+{
+  "name": "choblog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "hexo clean",
+    "build": "hexo generate",
+    "server": "hexo server -i 0.0.0.0",
+    "new": "hexo new",
+    "deploy": "hexo deploy",
+    "dev": "hexo server -i 0.0.0.0 -p 4000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "hexo": {
+    "version": "7.3.0"
+  },
+  "dependencies": {
+    "hexo": "^7.3.0",
+    "hexo-cli": "^4.3.2",
+    "hexo-generator-index": "^4.0.0",
+    "hexo-generator-searchdb": "^1.5.0",
+    "hexo-offline": "^4.0.0",
+    "hexo-renderer-marked": "^7.0.1",
+    "hexo-renderer-pug": "^3.0.0",
+    "hexo-renderer-stylus": "^3.0.1",
+    "hexo-server": "^3.0.0",
+    "hexo-tag-aplayer": "^3.0.4"
+  }
+}

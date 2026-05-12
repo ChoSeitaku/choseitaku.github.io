@@ -1,0 +1,9 @@
+[
+  {
+    "name": "本地歌曲示例",
+    "artist": "歌手名",
+    "url": "/music/example.mp3",
+    "cover": "/img/random01.png",
+    "lrc": "/music/example.lrc"
+  }
+]
