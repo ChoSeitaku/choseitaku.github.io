@@ -100,6 +100,25 @@ aplayer:
   meting: true
   asset_inject: false
 
+# Bangumi
+# https://github.com/HCLonely/hexo-bilibili-bangumi
+bangumi:
+  enable: true
+  source: bili
+  path: bangumis/index.html
+  vmid: 23167911
+  title: 追番列表
+  quote: 生命不息，追番不止！
+  show: 1
+  lazyload: true
+  webp: true
+  progress: true
+  progressBar: true
+cinema:
+  enable: false
+game:
+  enable: false
+
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
