@@ -1,0 +1,25 @@
+- creativity_list:
+    - name: Java
+      color: "#ED8B00"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg
+    - name: Spring Boot
+      color: "#6DB33F"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg
+    - name: MySQL
+      color: "#4479A1"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg
+    - name: Redis
+      color: "#DC382D"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg
+    - name: Docker
+      color: "#2496ED"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg
+    - name: Prometheus
+      color: "#E6522C"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prometheus/prometheus-original.svg
+    - name: Grafana
+      color: "#F46800"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg
+    - name: Nginx
+      color: "#009639"
+      icon: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg

@@ -127,18 +127,22 @@ if site.data.about
               b=mapStrengthenTitle
           .author-content-item.selfInfo.single
             - let { selfInfoTips1, selfInfoContentYear, selfInfoTips2, selfInfoContent2, selfInfoTips3, selfInfoContent3 } = item.selfInfo
-            div
-              span.selfInfo-title=selfInfoTips1
-              |  
-              span.selfInfo-content#selfInfo-content-year(style='color:#43a6c6')=selfInfoContentYear
-            div
-              span.selfInfo-title=selfInfoTips2
-              |  
-              span.selfInfo-content(style='color:#c69043')=selfInfoContent2
-            div
-              span.selfInfo-title=selfInfoTips3
-              |  
-              span.selfInfo-content(style='color:#b04fe6')=selfInfoContent3
+            .selfInfo-row(style='display:flex;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:0.5rem 1.5rem')
+              if selfInfoTips1
+                .selfInfo-pair
+                  span.selfInfo-title=selfInfoTips1
+                  |
+                  span.selfInfo-content#selfInfo-content-year(style='color:#43a6c6')=selfInfoContentYear
+              if selfInfoTips3
+                .selfInfo-pair
+                  span.selfInfo-title=selfInfoTips3
+                  |
+                  span.selfInfo-content(style='color:#b04fe6')=selfInfoContent3
+              if selfInfoTips2
+                .selfInfo-pair
+                  span.selfInfo-title=selfInfoTips2
+                  |
+                  span.selfInfo-content(style='color:#c69043')=selfInfoContent2
       
       .author-content
         .author-content-item.personalities
@@ -428,34 +432,36 @@ if site.data.about
         }
 
         // 出生年份动画
-            const selfInfoContentYear = new CountUp("selfInfo-content-year", 0, #{selfInfoContentYear}, 0, 2, {
-              useEasing: true,
-              useGrouping: false,
-              separator: ",",
-              decimal: ".",
-              prefix: "",
-              suffix: "",
-            });
+        if (document.getElementById("selfInfo-content-year")) {
+          const selfInfoContentYear = new CountUp("selfInfo-content-year", 0, #{selfInfoContentYear}, 0, 2, {
+            useEasing: true,
+            useGrouping: false,
+            separator: ",",
+            decimal: ".",
+            prefix: "",
+            suffix: "",
+          });
 
-            let selfInfoContentYearElement = document.querySelector(".author-content-item.selfInfo.single");
-            function selfInfoContentYearUp() {
-              if (!selfInfoContentYearElement) return;
+          let selfInfoContentYearElement = document.querySelector(".author-content-item.selfInfo.single");
+          function selfInfoContentYearUp() {
+            if (!selfInfoContentYearElement) return;
 
-              const callback = (entries, observer) => {
-                entries.forEach(entry => {
-                  if (entry.isIntersecting) {
-                    selfInfoContentYear.start();
-                observer.disconnect();
-                  }
-                });
-              };
+            const callback = (entries, observer) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  selfInfoContentYear.start();
+                  observer.disconnect();
+                }
+              });
+            };
 
-          const options = { root: null, rootMargin: "0px", threshold: 0 };
-              const observer = new IntersectionObserver(callback, options);
-              observer.observe(selfInfoContentYearElement);
-            }
+            const options = { root: null, rootMargin: "0px", threshold: 0 };
+            const observer = new IntersectionObserver(callback, options);
+            observer.observe(selfInfoContentYearElement);
+          }
 
-            selfInfoContentYearUp();
+          selfInfoContentYearUp();
+        }
 
         var pursuitInterval = null;
         pursuitInterval = setInterval(function () {

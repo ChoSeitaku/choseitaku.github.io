@@ -14,6 +14,7 @@ menu:
     追番页: /bangumis/ || anzhiyu-icon-bilibili
     相册集: /album/ || anzhiyu-icon-images
     小空调: /air-conditioner/ || anzhiyu-icon-fan
+    小房间: /room/ || anzhiyu-icon-house-chimney
 
   关于:
     随便逛逛: javascript:toRandomPost() || anzhiyu-icon-shoe-prints1
@@ -30,7 +31,13 @@ nav:
       item:
         - name: 博客
           link: https://choseitaku.github.io/
-          icon: /img/favicon.ico
+          icon: /img/siteicon/favicon.png
+        - name: Twitter
+          link: https://x.com/choseitaku
+          icon: /img/siteicon/favicon.png
+        - name: CSDN
+          link: https://blog.csdn.net/CoderZzz6310
+          icon: /img/siteicon/favicon.png
     - title: 项目
       item:
         - name: GitHub
@@ -67,7 +74,8 @@ copy:
 #   name: link || icon
 social:
   Github: https://github.com/ChoSeitaku || anzhiyu-icon-github
-  # BiliBili: https://space.bilibili.com/372204786 || anzhiyu-icon-bilibili
+  Twitter: https://x.com/choseitaku || anzhiyu-icon-link
+  CSDN: https://blog.csdn.net/CoderZzz6310 || anzhiyu-icon-link
 
 # 作者卡片 状态
 author_status:
@@ -130,11 +138,11 @@ katex:
 # --------------------------------------
 
 # Favicon（网站图标）
-favicon: /favicon.ico
+favicon: /img/siteicon/favicon.png
 
 # Avatar (头像)
 avatar:
-  img: https://bu.dusays.com/2023/04/27/64496e511b09c.jpg
+  img: /img/item/avatar.webp
   effect: false
 
 # Disable all banner image
@@ -147,7 +155,7 @@ index_img: /img/index_img.png
 default_top_img: false
 
 # archive page top image (归档页顶部图)
-archive_img: /img/archive_img.png
+archive_img: /img/random08.png
 
 # tag page top image (标签页顶部图)
 tag_img: /img/tag_img.png
@@ -187,17 +195,19 @@ cover:
     - /img/random23.png
     - /img/random24.png
     - /img/random25.png
+    - /img/random26.png
+    - /img/random27.png
 
 # Replace Broken Images (替换无法显示的图片)
 error_img:
   flink: /img/friend_404.gif
-  post_page: /img/404.jpg
+  post_page: /img/random11.png
 
 # A simple 404 page
 error_404:
   enable: true
   subtitle: "请尝试站内搜索寻找文章"
-  background: https://bu.dusays.com/2023/05/08/645907596997d.gif
+  background: /img/random12.png
 
 post_meta:
   page: # Home Page
@@ -257,7 +267,7 @@ post_copyright:
   enable: true
   decode: false
   author_href:
-  location: 长沙
+  location: 深圳
   license: CC BY-NC-SA 4.0
   license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
   avatarSinks: false # hover时头像下沉
@@ -464,12 +474,12 @@ footer:
   bdageitem:
     enable: true
     list:
-      - link: https://hexo.io/ #徽标指向网站链接
-        shields: https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Frame-Hexo.svg #徽标API
-        message: 博客框架为Hexo_v7.3.0 #徽标提示语
-      - link: https://hexo.anheyu.com/
+      - link: https://hexo.io/
+        shields: https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Frame-Hexo.svg
+        message: 博客框架为Hexo_v7.3.0
+      - link: https://github.com/ChoSeitaku
         shields: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.9/img/Theme-AnZhiYu-2E67D3.svg
-        message: 本站使用AnZhiYu主题
+        message: 本站使用安知鱼主题
       - link: https://github.com/ChoSeitaku
         shields: https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Source-Github.svg
         message: 本站项目由Github托管
@@ -548,8 +558,8 @@ footer:
       enable: false
       link: /copyright
     linkList:
-      - link: https://github.com/anzhiyu-c/hexo-theme-anzhiyu
-        text: 主题
+      - link: https://github.com/ChoSeitaku
+        text: GitHub
       # - link: https://image.anheyu.com
       #   text: 图床
       # - link: https://beian.miit.gov.cn/
@@ -811,7 +821,7 @@ preloader:
   source: 3
   # pace theme (see https://codebyzach.github.io/pace/)
   pace_css_url:
-  avatar: https://npm.elemecdn.com/anzhiyu-blog-static@1.0.4/img/avatar.jpg # 自定加载动画义头像
+  avatar: /img/item/avatar.webp # 自定加载动画义头像
 
 # aside (侧边栏)
 # --------------------------------------
@@ -828,7 +838,7 @@ aside:
     category: true
   card_author:
     enable: true
-    description: <div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);"><b style="color:#fff">00 后｜AI 全栈开发者</b></div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">AI 量化・AI 工作流・OPC<br>日语 & 英语双语｜自媒体创作者<br>副业深耕中，奔赴 A8 人生目标</div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);font-size:0.9em;">Post-00s | AI Full-Stack Developer<br>AI Quant · AI Workflow · OPC<br>Japanese & English Bilingual | Self-Media Creator<br>Side Hustle Practitioner, A8 life goal oriented</div> # 默认为站点描述
+    description: <div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);"><b style="color:#fff">00 后｜AI 全栈开发者</b></div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">AI 量化・AI 工作流・OPC<br>日语 & 英语双语｜自媒体创作者<br>副业深耕中，奔赴 A8 人生目标</div>
     name_link: /about
 
   card_announcement:
@@ -880,7 +890,7 @@ busuanzi:
 # Formal: Month/Day/Year Time or Year/Month/Day Time
 runtimeshow:
   enable: true
-  publish_date: 4/1/2021 00:00:00
+  publish_date: 05/11/2026 00:00:00
 
 # Console - Newest Comments
 newest_comments:
@@ -1074,11 +1084,16 @@ home_top:
   subTitle: 记录技术与生活。
   siteText: choseitaku.github.io
   category:
-    - name: 杂记
-      path: /categories/杂记/
+    - name: AI
+      path: /tags/AI/
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
-      icon: anzhiyu-icon-book
+      icon: anzhiyu-icon-robot
+    - name: 项目
+      path: /tags/项目/
+      shadow: var(--anzhiyu-shadow-red)
+      class: red
+      icon: anzhiyu-icon-code
     - name: 随笔
       path: /tags/随笔/
       shadow: var(--anzhiyu-shadow-green)
@@ -1158,6 +1173,7 @@ nav_music:
   id: 17961799618
   server: netease
   volume: 0.7 # 默认音量
+  default_song_id: 3346496288 # 默认播放歌曲ID（远航星的告别）
   all_playlist: https://music.163.com/#/playlist?id=17961799618
 
 # 路径为 /music 的音乐页面默认加载的歌单 1. nav_music 2. custom

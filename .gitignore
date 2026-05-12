@@ -5,3 +5,9 @@ public/
 .DS_Store
 Thumbs.db
 themes/anzhiyu/.git
+
+# Project specific
+db.json
+.claude/
+package-lock.json
+themes/anzhiyu/.git

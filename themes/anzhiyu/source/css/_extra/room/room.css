@@ -75,7 +75,8 @@ body[data-type="room"] #page .page-title {
   width: 28vw;
   height: 28vw;
   transform: perspective(90vw) rotateX(75deg) rotateZ(45deg) translateZ(-9vw);
-  left: 45%;
+  left: 50%;
+  margin-left: -14vw;
   top: 100px;
 }
 
