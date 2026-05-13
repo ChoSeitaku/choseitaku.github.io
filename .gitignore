@@ -1,8 +1,0 @@
-node_modules/
-public/
-db.json
-*.log
-.DS_Store
-Thumbs.db
-themes/anzhiyu/.git
-.claude/
