@@ -24,9 +24,13 @@ jobs:
       - name: Build site
         run: npx hexo generate
 
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Add .nojekyll
+        run: touch public/.nojekyll
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          folder: public
-          branch: gh-pages
-          clean: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          force_orphan: true
