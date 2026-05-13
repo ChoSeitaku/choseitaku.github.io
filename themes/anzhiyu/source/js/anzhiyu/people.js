@@ -56,7 +56,7 @@ function _createClass(e, r, t) {
   return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), e;
 }
 var peopleConfig = {
-    src: GLOBAL_CONFIG.peoplecanvas.img,
+    srcs: GLOBAL_CONFIG.peoplecanvas.imgs || (GLOBAL_CONFIG.peoplecanvas.img ? [GLOBAL_CONFIG.peoplecanvas.img] : []),
     rows: 15,
     cols: 7,
   },
@@ -85,7 +85,7 @@ var peopleConfig = {
       n = e.peep,
       o = 0.5 < Math.random() ? 1 : -1,
       i = 100 - 250 * gsap.parseEase("power2.in")(Math.random()),
-      s = a.height - n.height + i;
+      s = (a.height - n.height) / 2 + i / 2;
     return (
       1 == o ? ((r = -n.width), (t = a.width), (n.scaleX = 1)) : ((r = a.width + n.width), (t = 0), (n.scaleX = -1)),
       (n.x = r),
@@ -165,9 +165,41 @@ var peopleConfig = {
       ]),
       a
     );
-  })(),
-  img = document.createElement("img");
-(img.onload = init), (img.src = peopleConfig.src);
+  })();
+
+var imageSources = peopleConfig.srcs;
+var loadedImages = [];
+var loadCount = 0;
+
+function onImageLoad() {
+  loadCount++;
+  if (loadCount === imageSources.length) {
+    // 确保 DOM 已就绪，否则等待
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  }
+}
+
+if (imageSources.length === 0) {
+  // No images configured, do nothing
+  console.warn("peoplecanvas: no image sources configured");
+} else {
+  imageSources.forEach(function (src) {
+    var img = document.createElement("img");
+    img.onload = function () {
+      loadedImages.push(img);
+      onImageLoad();
+    };
+    img.onerror = function () {
+      onImageLoad(); // count failures to avoid deadlock
+    };
+    img.src = src;
+  });
+}
+
 let peoplecanvasEl = document.getElementById("peoplecanvas");
 
 let ctx = peoplecanvasEl ? peoplecanvasEl.getContext("2d") : undefined,
@@ -191,7 +223,9 @@ function cleanupPeopleCanvas() {
 }
 
 function init() {
+  peoplecanvasEl = document.getElementById("peoplecanvas");
   if (!peoplecanvasEl) return;
+  ctx = peoplecanvasEl.getContext("2d");
   // 如果 allPeeps 已有数据，先清空避免重复
   if (allPeeps.length === 0) {
     createPeeps();
@@ -222,22 +256,22 @@ if (!isbindPjax) {
 }
 
 function createPeeps() {
-  for (
-    var e = peopleConfig.rows,
-      r = peopleConfig.cols,
-      t = e * r,
-      a = img.naturalWidth / e,
-      n = img.naturalHeight / r,
-      o = 0;
-    o < t;
-    o++
-  )
-    allPeeps.push(
-      new Peep({
-        image: img,
-        rect: [(o % e) * a, ((o / e) | 0) * n, a, n],
-      })
-    );
+  var rows = peopleConfig.rows;
+  var cols = peopleConfig.cols;
+  var cellCount = rows * cols;
+
+  loadedImages.forEach(function (img) {
+    var cellW = img.naturalWidth / rows;
+    var cellH = img.naturalHeight / cols;
+    for (var o = 0; o < cellCount; o++) {
+      allPeeps.push(
+        new Peep({
+          image: img,
+          rect: [(o % rows) * cellW, ((o / rows) | 0) * cellH, cellW, cellH],
+        })
+      );
+    }
+  });
 }
 
 function resize() {
@@ -257,7 +291,8 @@ function resize() {
 }
 
 function initCrowd() {
-  for (; availablePeeps.length; ) addPeepToCrowd().walk.progress(Math.random());
+  var maxPeeps = Math.ceil(availablePeeps.length * 0.4);
+  for (var i = 0; i < maxPeeps && availablePeeps.length; i++) addPeepToCrowd().walk.progress(Math.random());
 }
 
 function addPeepToCrowd() {

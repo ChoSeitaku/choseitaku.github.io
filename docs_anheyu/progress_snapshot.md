@@ -1,6 +1,6 @@
 # 项目配置进度快照
 
-生成时间: 2026-05-12 09:00
+生成时间: 2026-05-13 11:30
 
 ## 已完成
 
@@ -41,12 +41,23 @@
 - [x] source/link/index.md — 友链页 (type: "links")
 - [x] source/comments/index.md — 留言板 (type: "message")
 - [x] source/_posts/hello-world.md — 第一篇博客文章
+- [x] source/_posts/blog-building-guide.md — 建站技术文章
+
+### 首页轮播图
+- [x] 轮播图功能已启用（swiper.enable: true）
+- [x] 两篇文章已设置 swiper_index，在轮播图中展示
+- [x] 封面图使用 random01/random02
 
 ### 构建修复
 - [x] package.json 添加 `"hexo": {}` 字段 — 修复 hexo 7.3.0 env.init 为 false 导致插件不加载的问题
 - [x] npm scripts 已改为直接使用 `hexo` CLI 命令
 - [x] 验证 `hexo clean` / `hexo generate` / `hexo server` 全部正常工作
 - [x] dev server (http://localhost:4000) 所有页面返回 200
+- [x] v1.0.0 tag 已创建（网络通畅后 push）
+
+### 部署方案
+- [x] 确定采用方案 B：本地构建后推送 gh-pages 分支
+- [x] GitHub Actions 部署不可用（runner_id=0，疑似 <username>.github.io 仓库限制）
 
 ## 已知问题（已解决）
 
@@ -59,14 +70,14 @@
 ## 待办（下次继续）
 
 ### 优先级高
-1. [ ] 配置 GitHub Pages 部署 (gh-pages 分支)
-2. [ ] 配置导航菜单（启用主题菜单项）
-3. [ ] 配置首页轮播图 (swiper_index)
+1. [ ] 方案 B 部署：本地构建并推送 gh-pages（网络通畅时）
+2. [ ] 推送 v1.0.0 tag（网络通畅时）
+3. [ ] 配置评论区 (twikoo/valine 等)
 
 ### 优先级中
-4. [ ] 配置评论区 (twikoo/valine 等)
-5. [ ] 添加更多博客文章
-6. [ ] 配置 _config.anzhiyu.yml 个性化设置
+4. [ ] 添加更多博客文章
+5. [ ] 配置 _config.anzhiyu.yml 个性化设置
+6. [ ] 配置导航菜单（启用主题菜单项）
 
 ### 优先级低
 7. [ ] 音乐馆页面
@@ -82,9 +93,12 @@ F:\choblog\choblog\
 ├── _config.yml              # Hexo 站点配置
 ├── _config.anzhiyu.yml      # 主题配置（高优先级覆盖）
 ├── package.json             # 依赖管理（已修复 hexo 字段）
-├── docs_anheyu/             # 安知鱼文档备份（20个md文件）
+├── .gitignore
+├── docs_anheyu/             # 安知鱼文档备份
 ├── source/
-│   ├── _posts/hello-world.md
+│   ├── _posts/
+│   │   ├── hello-world.md           # 第一篇博客（swiper_index: 1）
+│   │   └── blog-building-guide.md   # 建站技术文章（swiper_index: 2）
 │   ├── tags/index.md
 │   ├── categories/index.md
 │   ├── about/index.md
@@ -92,6 +106,8 @@ F:\choblog\choblog\
 │   └── comments/index.md
 ├── themes/anzhiyu/          # 安知鱼主题源码
 ├── scaffolds/               # Hexo 脚手架模板
-├── public/                  # 生成输出目录（35个文件）
+├── public/                  # 生成输出目录（91个文件）
+├── .github/workflows/
+│   └── deploy.yml           # GitHub Actions（不可用，转方案B）
 └── node_modules/
 ```

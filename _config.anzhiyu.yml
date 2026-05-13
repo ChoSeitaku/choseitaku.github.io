@@ -1267,7 +1267,10 @@ rightClickMenu:
 # 首页随便逛逛people模式 而非技能点模式，关闭后为技能点模式需要配置creativity.yml
 peoplecanvas:
   enable: true
-  img: https://upload-bbs.miyoushe.com/upload/2024/07/27/125766904/ba62475f396df9de3316a08ed9e65d86_5680958632268053399..png
+  imgs:
+    - /img/sprite-sheet.webp
+    # 在这里添加更多精灵图 URL，每次刷新随机加载多张图中的角色
+    # - https://你的第二张精灵图.png
 
 # 动效
 dynamicEffect:
