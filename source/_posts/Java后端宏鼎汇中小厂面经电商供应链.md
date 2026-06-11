@@ -6,6 +6,7 @@ tags:
 categories:
   - 技术
 description: 整理 Java 后端面试高频考点，涵盖 AI 编码验证、线程安全、synchronized 锁升级、Spring 事务失效、AOP 与循环依赖、线程池实践、MySQL 调优、B+ 树索引、策略模式、大表分页优化、分库分表等核心主题。
+cover: /img/random01.png
 ---
 
 ## 前言
