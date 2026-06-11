@@ -6,7 +6,7 @@ tags:
 categories:
   - 随笔
 description: 这是我的个人博客的第一篇文章，记录建站的初衷与对未来的期许。
-cover: /img/random01.png
+cover: /img/random03.png
 swiper_index: 1
 top_group_index: 1
 ---
