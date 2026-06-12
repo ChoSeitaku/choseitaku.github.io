@@ -50,6 +50,16 @@ cover: /img/random01.png
    - random16: Java 后端工程化面试题精炼（下）
    - random21: Java 分布式项目面试题精炼
 
+## 删除文章
+
+删除 `source/_posts/` 下的 `.md` 文件即可：
+
+```bash
+rm source/_posts/要删除的文章.md
+```
+
+删除后需要重新部署和推送。
+
 ## 部署（关键！）
 
 ### ✅ 正确方式：用 hexo-deployer-git
