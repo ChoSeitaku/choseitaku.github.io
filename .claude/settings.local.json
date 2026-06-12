@@ -1,20 +1,29 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add *)",
-      "Bash(git rm *)",
-      "Bash(git commit *)",
-      "Bash(git push *)",
       "Bash(git checkout *)",
-      "Bash(git stash *)",
-      "Bash(git remote *)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://www.baidu.com\" --connect-timeout 5)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://www.google.com\" --connect-timeout 5)",
-      "Bash(GIT_HTTP_MAX_RETRIES=5 git push origin gh-pages --force)",
       "Bash(npx hexo *)",
       "Bash(npm install *)",
-      "Bash(powershell *)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4000)"
+      "Bash(git add *)",
+      "Bash(git commit -m 'chore: 配置 hexo-deployer-git 一键部署到 gh-pages *)",
+      "Bash(git commit -m 'docs: 添加 CLAUDE.md，记录博客写作与部署规范 *)",
+      "Bash(git push *)",
+      "Bash(awk '/class=\"article-title\"/' public/index.html)",
+      "WebFetch(domain:choseitaku.github.io)",
+      "Bash(git commit -m 'fix: 去掉重复封面，让主题自动随机分配封面 *)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill *)",
+      "Bash(xargs grep -l \"post\\\\|article\")",
+      "WebFetch(domain:localhost)",
+      "Bash(curl -s http://localhost:4000/)",
+      "Bash(curl -s \"http://localhost:4000/2026/06/08/JavaWeb%E5%9F%BA%E7%A1%80%E9%9D%A2%E8%AF%95%E9%A2%98%E7%B2%BE%E7%82%BC/\")",
+      "Bash(curl -s \"http://localhost:4000/2026/06/09/Java%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96%E9%9D%A2%E8%AF%95%E9%A2%98%E7%B2%BE%E7%82%BC-%E4%B8%8A/\")",
+      "Bash(curl -s \"http://localhost:4000/2026/06/10/Java%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96%E9%9D%A2%E8%AF%95%E9%A2%98%E7%B2%BE%E7%82%BC-%E4%B8%8B/\")",
+      "Bash(curl -s \"http://localhost:4000/2026/06/11/Java%E5%88%86%E5%B8%83%E5%BC%8F%E9%A1%B9%E7%9B%AE%E9%9D%A2%E8%AF%95%E9%A2%98%E7%B2%BE%E7%82%BC/\")",
+      "Bash(git rm *)",
+      "Bash(git reset *)",
+      "Bash(git commit -m 'feat: 新增4篇Java面经精炼文章，更新CLAUDE.md封面规范 *)",
+      "Bash(git commit -m 'fix: hello-world 封面改为 random03，避免与面经文章重复 *)"
     ]
   }
 }
