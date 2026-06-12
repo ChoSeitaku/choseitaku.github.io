@@ -74,6 +74,16 @@ deploy:
   branch: gh-pages
 ```
 
+### ✅ 推送源码到 main 分支
+
+每次修改文章或配置后，需要将源码推送到 main 分支备份：
+
+```bash
+git add source/_posts/ CLAUDE.md _config.yml
+git commit -m "提交信息"
+git push origin main
+```
+
 ### ❌ 严禁做的事
 
 - **禁止用 `git subtree split` 或 `git subtree push` 操作 public 目录** — `public/` 是 gitignored 的，subtree 找不到任何 revision，会导致远程 gh-pages 分支被误删
