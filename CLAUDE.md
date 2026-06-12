@@ -109,3 +109,19 @@ npx hexo server
 ## 网络问题
 
 GitHub 在国内可能不稳定，push/deploy 失败时多试几次。`_config.yml` 中 deploy repo 使用 HTTPS 地址，如需 SSH 可改为 `git@github.com:ChoSeitaku/choseitaku.github.io.git`。
+
+### 代理配置（推荐）
+
+如果遇到连接超时，可以配置代理（端口 7892）：
+
+```bash
+git config --global http.proxy http://127.0.0.1:7892
+git config --global https.proxy http://127.0.0.1:7892
+```
+
+部署完成后清除代理配置：
+
+```bash
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
