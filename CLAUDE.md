@@ -35,7 +35,20 @@ cover: /img/random01.png
 ```
 
 3. 参考已有文章格式：`source/_posts/hello-world.md`
-4. **必须指定 cover**：front-matter 中必须包含 `cover` 字段（如 `cover: /img/random01.png`），否则安知鱼主题的 `random_cover.js` 会在每次渲染时从 `default_cover` 列表中随机抽图，导致主页封面和文章页背景图不一致。可选的封面图在 `source/img/random01.png` ~ `random27.png`。
+4. **必须指定 cover 且避免重复**：front-matter 中必须包含 `cover` 字段，否则安知鱼主题的 `random_cover.js` 会在每次渲染时随机抽图，导致主页封面和文章页背景图不一致。**新增文章时必须先检查现有文章已使用的封面，避免重复。** 可选封面图：`source/img/random01.png` ~ `random27.png`。
+
+   当前封面占用情况：
+   - random01: Java后端宏鼎汇中小厂面经电商供应链
+   - random02: 从零搭建 Hexo + 安知鱼主题博客
+   - random03: 你好，世界 — 我的博客开篇
+   - random04: Java基础常见面试题精炼（一）：核心概念与基础语法
+   - random05: Java基础常见面试题精炼（二）：面向对象与异常处理
+   - random06: JavaWeb 基础面试题精炼
+   - random07: Java基础常见面试题精炼（三）：集合框架与线程安全
+   - random08: Java基础常见面试题精炼（四）：高级特性与网络编程
+   - random11: Java 后端工程化面试题精炼（上）
+   - random16: Java 后端工程化面试题精炼（下）
+   - random21: Java 分布式项目面试题精炼
 
 ## 部署（关键！）
 
