@@ -48,6 +48,7 @@ cover: /img/random01.png
    - random08: Java基础常见面试题精炼（四）：高级特性与网络编程
    - random11: Java 后端工程化面试题精炼（上）
    - random16: Java 后端工程化面试题精炼（下）
+   - random09: VibeCoding 实战指南：从入门到高效协作
    - random21: Java 分布式项目面试题精炼
 
 ## 删除文章
