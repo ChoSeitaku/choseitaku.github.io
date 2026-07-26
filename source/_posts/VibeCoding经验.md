@@ -3,6 +3,7 @@ title: VibeCoding 实战指南：从入门到高效协作
 date: 2026-06-16 12:00:00
 tags:
   - 随笔
+  - AI
 categories:
   - AI
 description: 分享 AI 辅助编程（Vibe Coding）的实战经验，涵盖需求分析、MCP/Skills 工具、提示词设计、文档沉淀、版本控制、UI 优化、AI 中断处理等核心技巧。
