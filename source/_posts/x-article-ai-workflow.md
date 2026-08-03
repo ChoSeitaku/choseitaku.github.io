@@ -1,6 +1,6 @@
 ---
 title: x-article-ai-workflow：基于 AI 的全自动化内容创作流水线
-date: 2026-08-03 10:00:00
+date: 2026-06-12 10:00:00
 tags:
   - 项目
   - AI
