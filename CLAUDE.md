@@ -50,6 +50,7 @@ cover: /img/random01.png
    - random16: Java 后端工程化面试题精炼（下）
    - random09: VibeCoding 实战指南：从入门到高效协作
    - random21: Java 分布式项目面试题精炼
+   - random12: x-article-ai-workflow：基于 AI 的全自动化内容创作流水线
 
 ## 删除文章
 
