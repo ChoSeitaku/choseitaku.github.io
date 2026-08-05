@@ -4,8 +4,6 @@ date: 2026-06-15 10:00:00
 tags:
   - 项目
   - AI
-  - Next.js
-  - MediaPipe
 categories:
   - 项目
 description: 本文记录了「星拓健康助手」项目的完整技术方案与实现细节，涵盖 MediaPipe Pose 本地姿态分析、AI 代理架构设计、纯前端训练引擎等核心模块。
