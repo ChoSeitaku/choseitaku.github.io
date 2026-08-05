@@ -466,6 +466,6 @@ AI 功能不可用时的优雅降级：
 ---
 
 **作者**: ChoSeitaku  
-**日期**: 2026年8月  
+**日期**: 2026年6月  
 **技术栈**: Next.js 15 + TypeScript + Tailwind CSS  
 **许可**: MIT License
