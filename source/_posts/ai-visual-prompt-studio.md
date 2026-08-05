@@ -1,5 +1,5 @@
 ---
-title: 从零打造 AI Visual Prompt Studio：一个前端人的 AI 工具探索之路
+title: 从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路
 date: 2026-06-19 10:00:00
 tags:
   - 项目
@@ -10,7 +10,7 @@ description: 本文详细记录了 AI Visual Prompt Studio 项目的设计思路
 cover: /img/random14.png
 ---
 
-# 从零打造 AI Visual Prompt Studio：一个前端人的 AI 工具探索之路
+# 从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路
 
 > 本文详细记录了 AI Visual Prompt Studio 项目的设计思路、技术选型、核心实现与开发心得。这是一个面向 AI 视觉创作者的提示词工程工具，完全运行在浏览器端，无需后端服务。
 
