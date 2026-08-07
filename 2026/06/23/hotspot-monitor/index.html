@@ -1,0 +1,672 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘 | 长星拓的博客</title><meta name="keywords" content="AI,项目"><meta name="author" content="长星拓"><meta name="copyright" content="长星拓"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7f9fe"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-touch-fullscreen" content="yes"><meta name="apple-mobile-web-app-title" content="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘"><meta name="application-name" content="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="#f7f9fe"><meta property="og:type" content="article"><meta property="og:title" content="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘"><meta property="og:url" content="https://choseitaku.github.io/2026/06/23/hotspot-monitor/index.html"><meta property="og:site_name" content="长星拓的博客"><meta property="og:description" content="个人项目 · 全栈开发 · 从零到一。热点瞭望台是一个轻量级多源 AI 热点监控工具，涵盖搜索引擎并发抓取、AI判别真伪、Web面板展示、浏览器推送等功能。"><meta property="og:locale" content="zh-CN"><meta property="og:image" content="https://choseitaku.github.io/img/random15.png"><meta property="article:author" content="长星拓"><meta property="article:tag" content="[&quot;博客&quot;,&quot;Hexo&quot;,&quot;安知鱼&quot;]"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://choseitaku.github.io/img/random15.png"><meta name="description" content="个人项目 · 全栈开发 · 从零到一。热点瞭望台是一个轻量级多源 AI 热点监控工具，涵盖搜索引擎并发抓取、AI判别真伪、Web面板展示、浏览器推送等功能。"><link rel="shortcut icon" href="/img/siteicon/favicon.png"><link rel="canonical" href="https://choseitaku.github.io/2026/06/23/hotspot-monitor/"><link rel="preconnect" href="//cdn.cbd.int"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="xxx"/><meta name="baidu-site-verification" content="code-xxx"/><meta name="msvalidate.01" content="xxx"/><link rel="manifest" href="/manifest.json"/><meta name="msapplication-TileColor" content="var(--anzhiyu-main)"/><link rel="mask-icon" href="/img/siteicon/apple-icon-180.png" color="#5bbad5"/><link rel="apple-touch-icon" sizes="180x180" href="/img/siteicon/apple-icon-180.png"/><link rel="apple-touch-icon-precomposed" sizes="180x180" href="/img/siteicon/apple-icon-180.png"/><link rel="icon" type="image/png" sizes="32x32" href="/img/siteicon/32.png"/><link rel="icon" type="image/png" sizes="16x16" href="/img/siteicon/16.png"/><link rel="bookmark" href="/img/siteicon/apple-icon-180.png"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2224-1668.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2160-1620.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1290-2796.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2796-1290.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1179-2556.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2556-1179.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2778-1284.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2208-1242.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1334-750.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/@fancyapps/ui@6.1.6/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  linkPageTop: undefined,
+  peoplecanvas: {"enable":true,"img":"https://upload-bbs.miyoushe.com/upload/2024/07/27/125766904/ba62475f396df9de3316a08ed9e65d86_5680958632268053399..png","imgs":["/img/sprite-sheet.webp"]},
+  postHeadAiDescription: {"enable":true,"gptName":"AnZhiYu","mode":"local","switchBtn":false,"btnLink":"https://afdian.net/item/886a79d4db6711eda42a52540025c377","randomNum":3,"basicWordCount":1000,"key":"xxxx","Referer":"https://xx.xx/"},
+  diytitle: {"enable":true,"leaveTitle":"w(ﾟДﾟ)w 不要走！再看看嘛！","backTitle":"♪(^∇^*)欢迎肥来！"},
+  LA51: {"enable":true,"ck":null,"LingQueMonitorID":null},
+  greetingBox: {"enable":true,"default":"晚上好👋","list":[{"greeting":"晚安😴","startTime":0,"endTime":5},{"greeting":"早上好鸭👋, 祝你一天好心情！","startTime":6,"endTime":9},{"greeting":"上午好👋, 状态很好，鼓励一下～","startTime":10,"endTime":10},{"greeting":"11点多啦, 再坚持一下就吃饭啦～","startTime":11,"endTime":11},{"greeting":"午安👋","startTime":12,"endTime":14},{"greeting":"🌈充实的一天辛苦啦！","startTime":14,"endTime":18},{"greeting":"19点喽, 奖励一顿丰盛的大餐吧🍔","startTime":19,"endTime":19},{"greeting":"晚上好👋, 在属于自己的时间好好放松😌~","startTime":20,"endTime":24}]},
+  twikooEnvId: '',
+  commentBarrageConfig:undefined,
+  music_page_default: "nav_music",
+  root: '/',
+  preloader: {"source":3},
+  friends_vue_info: undefined,
+  navMusic: true,
+  navMusicId: '17961799618',
+  navMusicServer: 'netease',
+  mainTone: undefined,
+  authorStatus: {"skills":["💻 代码爱好者","📝 热爱写作分享","🚀 持续学习中"]},
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简","rightMenuMsgToTraditionalChinese":"转为繁体","rightMenuMsgToSimplifiedChinese":"转为简体"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":330},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    simplehomepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"copy":true,"copyrightEbable":false,"limitCount":50,"languages":{"author":"作者: 长星拓","link":"链接: ","source":"来源: 长星拓的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。","copySuccess":"复制成功，复制和转载请标注本文地址"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#425AEF","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.cbd.int/flickr-justified-gallery@2.2.0/dist/fjGallery.min.js',
+      css: 'https://cdn.cbd.int/flickr-justified-gallery@2.2.0/dist/fjGallery.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  shortcutKey: {"enable":true,"delay":100,"shiftDelay":200},
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  configTitle: '长星拓的博客',
+  title: '热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘',
+  postAI: '',
+  pageFillDescription: '热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘, 项目概述, 为什么做这个项目, 核心技术亮点, 1. 多源并发抓取架构, 2. Bilibili WBI 签名逆向, 3. 公平轮询算法 — 跨源 × 关键词双层调度, 4. AI 判别引擎 — 双模型容错, 5. 去重策略, 前端架构与交互设计, Bento Grid 布局, 热点卡片交互, 排序与筛选系统, 动画与视觉, 后端架构, API 设计, 定时任务, 数据持久化, 通知系统, 工程实践, 容错设计, 性能优化, 部署方案, 项目数据, 技术栈总结, 后续规划, 写在最后热点瞭望台一个全栈热点监控系统的技术复盘个人项目全栈开发从零到一项目概述热点瞭望台是一个轻量级多源热点监控工具核心链路为搜索引擎并发抓取去重与公平轮询判别真伪与置信度打分科技风面板展示浏览器推送邮件通知技术栈为什么做这个项目信息过载时代每天在等平台之间反复切换依然会错过真正有价值的热点我想做一个自动化的信息雷达让它帮我盯着多个来源用过滤噪音只把真正重要的信息推送到面前同时这个项目也是我对全栈工程能力的一次综合检验从网络爬虫并发调度集成到前端可视化推送通知定时任务每一个环节都值得深入思考核心技术亮点多源并发抓取架构系统集成了个异构搜索源每个源有独立的抓取策略和容错机制搜索源抓取方式特殊处理解析标准搜索结果解析提取新闻发布时间搜狗解析补全搜狗微信解析微信公众号文章签名动态密钥刷新签名结构化高级搜索互动量过滤关键设计每个源独立超时控制秒单源失败不影响其他源通过并发执行保证最大限度的数据采集每个源独立超时互不干扰签名逆向的搜索需要签名验证这是整个抓取模块中技术难度最高的部分密钥获取先访问站首页拿到再调用接口获取和签名算法使用位混淆表对参数进行重排拼接密钥后计算自动刷新密钥缓存分钟过期自动重新获取公平轮询算法跨源关键词双层调度问题等高产源每次搜索返回条结果而可能只有条如果直接合并高产源会淹没小众源解决方案设计了来源关键词双层公平轮询算法第一层每个来源内部按关键词分组后轮询展平编程大模型编程大模型第二层跨来源轮询每源设置硬配额源数不低于这样保证了每个来源至少有条候选进入审核避免了信息来源单一化判别引擎双模型容错采用为主兜底的双模型策略主力兜底对每条候选输出结构化该视频标题提及属于图像生成工具内容为实战用法合集符合社区热门讨论定义且来源可靠置信度阈值才会被收录为热点避免低质量内容干扰去重策略在数据量大的场景下去重是关键环节系统采用三字段联合去重其中会去除查询参数和片段避免同一内容因参数不同而被重复收录前端架构与交互设计布局采用便当盒布局设计将监控配置快速操作热点列表通知中心四大模块有机组合热点卡片交互每张热点卡片支持展开折叠展示完整信息展开后展示判定理由为什么这条内容被判定为热点详细信息收录时间发布时间触发方式置信度精确值原文链接一键复制新标签打开排序与筛选系统支持种排序维度排序方式逻辑相关性有搜索词时按匹配度评分标题摘要完全匹配否则按时间热度按置信度降序收录按扫描发现时间降序发布按信息源的原始发布时间降序加上来源筛选按来源过滤和关键词搜索多匹配形成完整的数据探索能力动画与视觉绘制的多层正弦波浪动画支持颜色速度透明度配置浮动粒子背景增加科技感按钮效果增强交互反馈卡片进入动画折叠展开过渡分页切换后端架构设计风格个核心端点获取关键词与监控范围添加关键词删除关键词更新监控范围手动触发扫描获取热点列表获取通知记录浏览器推送订阅服务健康状态定时任务使用每分钟自动执行扫描数据持久化采用文件存储目录适合轻量级部署无需数据库依赖关键词配置通知记录热点列表最多保留条浏览器推送订阅通知系统双通道通知浏览器基于协议通过推送邮件通知基于自动清理无效订阅工程实践容错设计每个抓取源独立超时单源崩溃不影响全局调用双模型容错失败自动切换通知发送失败静默处理不阻断主流程性能优化抓取节流关键词间延迟避免触发反爬前端分页每页条避免大列表渲染压力动画适配保证流畅部署方案开发模式前后端分离后端前端自动代理生产模式单端口托管构建托管前端项目数据经过一段时间的运行积累信息源个已发现热点条通知记录条覆盖平台搜狗微信公众号技术栈总结层技术选型理由前端框架生态成熟组件化开发效率高构建工具极速开发体验优秀样式方案原子化快速迭代动画声明式动画与深度集成后端框架轻量灵活适合服务引擎性价比高中文理解能力强定时任务语法零配置网页解析服务端高效解析后续规划数据可视化添加热点趋势图表展示各来源的数据分布多主题支持支持多套关键词配置一键切换监控主题向量搜索引入做语义去重提升去重精度插件浏览器扩展实时查看最新热点自动化部署自动构建部署写在最后这个项目让我完整经历了一个全栈产品从需求分析架构设计核心算法实现到部署上线的全过程其中最有收获的几个点并发调度独立超时的容错模式公平轮询算法双层轮询硬配额的设计思路集成结构化双模型容错的工程实践前端体验布局卡片展开折叠多维排序筛选项目已开源欢迎交流',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2026-08-07 19:12:19',
+  postMainColor: '',
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#18171d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f7f9fe')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body data-type="anzhiyu"><div id="web_bg"></div><div id="an_music_bg"></div><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><img class="loading-img nolazyload" alt="加载头像" src="/img/item/avatar.webp"/><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.getElementById('loading-box').classList.add("loaded");
+  },
+  initLoading: () => {
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+setTimeout(function(){preloader.endLoading();},10000)
+
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.10/progress_bar/progress_bar.css"/><script async="async" src="https://cdn.cbd.int/pace-js@1.2.4/pace.min.js" data-pace-options="{ &quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}"></script><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: url('/img/random15.png') center/contain no-repeat"><nav id="nav"><div id="nav-group"><span id="blog_name"><div class="back-home-button"><i class="anzhiyufont anzhiyu-icon-grip-vertical"></i><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://choseitaku.github.io/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="博客"/><span class="back-menu-item-text">博客</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://x.com/choseitaku" title="Twitter"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="Twitter"/><span class="back-menu-item-text">Twitter</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://blog.csdn.net/CoderZzz6310" title="CSDN"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="CSDN"/><span class="back-menu-item-text">CSDN</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub"/><span class="back-menu-item-text">GitHub</span></a></div></div></div></div><a id="site-name" href="/" accesskey="h"><div class="title">长星拓的博客</div><i class="anzhiyufont anzhiyu-icon-house-chimney"></i></a><div id="he-plugin-simple"></div><script>var WIDGET = {
+  "CONFIG": {
+    "modules": "0124",
+    "background": "2",
+    "tmpColor": "FFFFFF",
+    "tmpSize": "16",
+    "cityColor": "FFFFFF",
+    "citySize": "16",
+    "aqiColor": "E8D87B",
+    "aqiSize": "16",
+    "weatherIconSize": "24",
+    "alertIconSize": "18",
+    "padding": "10px 10px 10px 10px",
+    "shadow": "0",
+    "language": "auto",
+    "borderRadius": "20",
+    "fixed": "true",
+    "vertical": "top",
+    "horizontal": "left",
+    "left": "20",
+    "top": "7.1",
+    "key": "df245676fb434a0691ead1c63341cd94"
+  }
+}
+</script><link rel="stylesheet" href="https://widget.qweather.net/simple/static/css/he-simple.css?v=1.4.0"/><script src="https://widget.qweather.net/simple/static/js/he-simple.js?v=1.4.0"></script></span><div class="mask-name-container"><div id="name-container"><a id="page-name" href="javascript:anzhiyu.scrollToDest(0, 500)">PAGE_NAME</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 文章</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/archives/"><i class="anzhiyufont anzhiyu-icon-box-archive faa-tada" style="font-size: 0.9em;"></i><span> 全部文章</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/categories/"><i class="anzhiyufont anzhiyu-icon-shapes faa-tada" style="font-size: 0.9em;"></i><span> 分类列表</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags faa-tada" style="font-size: 0.9em;"></i><span> 标签列表</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 我的</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/music/"><i class="anzhiyufont anzhiyu-icon-music faa-tada" style="font-size: 0.9em;"></i><span> 音乐馆</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/bangumis/"><i class="anzhiyufont anzhiyu-icon-bilibili faa-tada" style="font-size: 0.9em;"></i><span> 追番页</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/album/"><i class="anzhiyufont anzhiyu-icon-images faa-tada" style="font-size: 0.9em;"></i><span> 相册集</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/air-conditioner/"><i class="anzhiyufont anzhiyu-icon-fan faa-tada" style="font-size: 0.9em;"></i><span> 小空调</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/room/"><i class="anzhiyufont anzhiyu-icon-house-chimney faa-tada" style="font-size: 0.9em;"></i><span> 小房间</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 关于</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="javascript:toRandomPost()"><i class="anzhiyufont anzhiyu-icon-shoe-prints1 faa-tada" style="font-size: 0.9em;"></i><span> 随便逛逛</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/about/"><i class="anzhiyufont anzhiyu-icon-paper-plane faa-tada" style="font-size: 0.9em;"></i><span> 关于本人</span></a></li></ul></div></div></div><div id="nav-right"><div class="nav-button only-home" id="travellings_button" title="随机前往一个开往项目网站"><a class="site-page" onclick="anzhiyu.totraveling()" title="随机前往一个开往项目网站" href="javascript:void(0);" rel="external nofollow" data-pjax-state="external"><i class="anzhiyufont anzhiyu-icon-train"></i></a></div><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机前往一个文章" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-dice"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索🔍" accesskey="s"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span> 搜索</span></a></div><input id="center-console" type="checkbox"/><label class="widget" for="center-console" title="中控台" onclick="anzhiyu.switchConsole();"><i class="left"></i><i class="widget center"></i><i class="widget right"></i></label><div id="console"><div class="console-card-group-reward"><ul class="reward-all console-card"><li class="reward-item"><a href="/img/QR/wechat.jpg" target="_blank"><img class="post-qr-code-img" alt="微信" src="/img/QR/wechat.jpg"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/QR/alipay.jpg" target="_blank"><img class="post-qr-code-img" alt="支付宝" src="/img/QR/alipay.jpg"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div><div class="console-card-group"><div class="console-card-group-left"><div class="console-card" id="card-newest-comments"><div class="card-content"><div class="author-content-item-tips">互动</div><span class="author-content-item-title"> 最新评论</span></div><div class="aside-list"><span>正在加载中...</span></div></div></div><div class="console-card-group-right"><div class="console-card tags"><div class="card-content"><div class="author-content-item-tips">兴趣点</div><span class="author-content-item-title">寻找你感兴趣的领域</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/AI/" style="font-size: 1.05rem;">AI<sup>5</sup></a><a href="/tags/Hexo/" style="font-size: 1.05rem;">Hexo<sup>1</sup></a><a href="/tags/%E5%BB%BA%E7%AB%99/" style="font-size: 1.05rem;">建站<sup>1</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.05rem;">随笔<sup>2</sup></a><a href="/tags/%E9%9D%A2%E7%BB%8F/" style="font-size: 1.05rem;">面经<sup>9</sup></a><a href="/tags/%E9%A1%B9%E7%9B%AE/" style="font-size: 1.05rem;">项目<sup>4</sup></a></div></div><hr/></div></div><div class="console-card history"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-box-archiv"></i><span>文章</span></div><div class="card-archives"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/06/"><span class="card-archive-list-date">六月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">10</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/05/"><span class="card-archive-list-date">五月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">6</span><span>篇</span></div></a></li></ul></div><hr/></div></div></div><div class="button-group"><div class="console-btn-item"><a class="darkmode_switchbutton" title="显示模式切换" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-moon"></i></a></div><div class="console-btn-item" id="consoleHideAside" onclick="anzhiyu.hideAsideBtn()" title="边栏显示控制"><a class="asideSwitch"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></a></div><div class="console-btn-item" id="consoleMusic" onclick="anzhiyu.musicToggle()" title="音乐开关"><a class="music-switch"><i class="anzhiyufont anzhiyu-icon-music"></i></a></div><div class="console-btn-item" id="consoleKeyboard" onclick="anzhiyu.keyboardToggle()" title="快捷键开关"><a class="keyboard-switch"><i class="anzhiyufont anzhiyu-icon-keyboard"></i></a></div></div><div class="console-mask" onclick="anzhiyu.hideConsole()" href="javascript:void(0);"></div></div><div class="nav-button" id="nav-totop"><a class="totopbtn" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i><span id="percent" onclick="anzhiyu.scrollToDest(0,500)">0</span></a></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);" title="切换"><i class="anzhiyufont anzhiyu-icon-bars"></i></a></div></div></div></nav><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original">原创</a><span class="post-meta-categories"><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE/" itemprop="url">项目</a></span><span class="article-meta tags"><a class="article-meta__tags" href="/tags/AI/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>AI</span></a><a class="article-meta__tags" href="/tags/%E9%A1%B9%E7%9B%AE/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>项目</span></a></span></div></div><h1 class="post-title" itemprop="name headline">热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="anzhiyufont anzhiyu-icon-calendar-days post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" itemprop="dateCreated datePublished" datetime="2026-06-23T02:00:00.000Z" title="发表于 2026-06-23 10:00:00">2026-06-23</time><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-history post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" itemprop="dateCreated datePublished" datetime="2026-08-07T11:12:19.409Z" title="更新于 2026-08-07 19:12:19">2026-08-07</time></span></div><div class="meta-secondline"><span class="post-meta-separator"></span><span class="post-meta-pv-cv" id="" data-flag-title="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘"><i class="anzhiyufont anzhiyu-icon-fw-eye post-meta-icon"></i><span class="post-meta-label" title="阅读量">阅读量:</span><span id="busuanzi_value_page_pv"><i class="anzhiyufont anzhiyu-icon-spinner anzhiyu-spin"></i></span></span><span class="post-meta-separator">       </span><span class="post-meta-position" title="作者IP属地为深圳"><i class="anzhiyufont anzhiyu-icon-location-dot"></i>深圳</span></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section><div id="post-top-cover"><img class="nolazyload" id="post-top-bg" src="/img/random15.png"></div></header><main id="blog-container"><div class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container" itemscope itemtype="https://choseitaku.github.io/2026/06/23/hotspot-monitor/"><header><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE/" itemprop="url">项目</a><a href="/tags/AI/" tabindex="-1" itemprop="url">AI</a><a href="/tags/%E9%A1%B9%E7%9B%AE/" tabindex="-1" itemprop="url">项目</a><h1 id="CrawlerTitle" itemprop="name headline">热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘</h1><span itemprop="author" itemscope itemtype="http://schema.org/Person">长星拓</span><time itemprop="dateCreated datePublished" datetime="2026-06-23T02:00:00.000Z" title="发表于 2026-06-23 10:00:00">2026-06-23</time><time itemprop="dateCreated datePublished" datetime="2026-08-07T11:12:19.409Z" title="更新于 2026-08-07 19:12:19">2026-08-07</time></header><h1 id="热点瞭望台-—-一个全栈-AI-热点监控系统的技术复盘"><a href="#热点瞭望台-—-一个全栈-AI-热点监控系统的技术复盘" class="headerlink" title="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘"></a>热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘</h1><blockquote>
+<p>个人项目 · 全栈开发 · 从零到一</p>
+</blockquote>
+<hr>
+<h2 id="项目概述"><a href="#项目概述" class="headerlink" title="项目概述"></a>项目概述</h2><p><strong>热点瞭望台 (Hotspot Monitor)</strong> 是一个轻量级多源 AI 热点监控工具，核心链路为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">7+ 搜索引擎并发抓取 → 去重与公平轮询 → AI 判别真伪与置信度打分 → 科技风 Web 面板展示 → 浏览器推送 / 邮件通知</span><br></pre></td></tr></table></figure>
+
+<p>技术栈：<strong>React 18 + Vite 5 + Tailwind CSS 3 + Express 4 + DeepSeek API</strong></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/website.jpg" alt="网站全貌"></p>
+<hr>
+<h2 id="为什么做这个项目"><a href="#为什么做这个项目" class="headerlink" title="为什么做这个项目"></a>为什么做这个项目</h2><p>信息过载时代，每天在 Bing、Bilibili、HackerNews、Twitter 等平台之间反复切换，依然会错过真正有价值的热点。我想做一个<strong>自动化的「信息雷达」</strong>：让它帮我盯着多个来源，用 AI 过滤噪音，只把真正重要的信息推送到面前。</p>
+<p>同时，这个项目也是我对<strong>全栈工程能力</strong>的一次综合检验——从网络爬虫、并发调度、AI 集成，到前端可视化、推送通知、定时任务，每一个环节都值得深入思考。</p>
+<hr>
+<h2 id="核心技术亮点"><a href="#核心技术亮点" class="headerlink" title="核心技术亮点"></a>核心技术亮点</h2><h3 id="1-多源并发抓取架构"><a href="#1-多源并发抓取架构" class="headerlink" title="1. 多源并发抓取架构"></a>1. 多源并发抓取架构</h3><p>系统集成了 <strong>7 个异构搜索源</strong>，每个源有独立的抓取策略和容错机制：</p>
+<table>
+<thead>
+<tr>
+<th>搜索源</th>
+<th>抓取方式</th>
+<th>特殊处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bing</td>
+<td>HTML 解析 (Cheerio)</td>
+<td>标准搜索结果</td>
+</tr>
+<tr>
+<td>Bing News</td>
+<td>HTML 解析</td>
+<td>提取新闻发布时间</td>
+</tr>
+<tr>
+<td>搜狗</td>
+<td>HTML 解析</td>
+<td>URL 补全</td>
+</tr>
+<tr>
+<td>搜狗微信</td>
+<td>HTML 解析</td>
+<td>微信公众号文章</td>
+</tr>
+<tr>
+<td>Bilibili</td>
+<td>WBI 签名 API</td>
+<td>动态密钥刷新 + MD5 签名</td>
+</tr>
+<tr>
+<td>HackerNews</td>
+<td>Algolia REST API</td>
+<td>结构化 JSON</td>
+</tr>
+<tr>
+<td>Twitter</td>
+<td>TwitterAPI.io</td>
+<td>高级搜索 + 互动量过滤</td>
+</tr>
+</tbody></table>
+<p><strong>关键设计</strong>：每个源独立 <code>setTimeout</code> 超时控制（12-15秒），单源失败不影响其他源。通过 <code>Promise.allSettled</code> 并发执行，保证最大限度的数据采集。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 每个源独立超时，互不干扰</span></span><br><span class="line"><span class="keyword">const</span> searches = <span class="keyword">await</span> <span class="title class_">Promise</span>.<span class="title function_">allSettled</span>(candidatePromises);</span><br><span class="line"><span class="keyword">const</span> candidates = searches.<span class="title function_">flatMap</span>(<span class="function"><span class="params">r</span> =&gt;</span> r.<span class="property">status</span> === <span class="string">&#x27;fulfilled&#x27;</span> ? r.<span class="property">value</span> : []);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Bilibili-WBI-签名逆向"><a href="#2-Bilibili-WBI-签名逆向" class="headerlink" title="2. Bilibili WBI 签名逆向"></a>2. Bilibili WBI 签名逆向</h3><p>Bilibili 的搜索 API 需要 WBI 签名验证，这是整个抓取模块中技术难度最高的部分：</p>
+<ul>
+<li><strong>密钥获取</strong>：先访问 B站首页拿到 <code>buvid3</code> cookie，再调用 nav 接口获取 <code>img_key</code> 和 <code>sub_key</code></li>
+<li><strong>签名算法</strong>：使用 64 位混淆表对参数进行重排，拼接密钥后计算 MD5</li>
+<li><strong>自动刷新</strong>：密钥缓存 30 分钟，过期自动重新获取</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">signBilibili</span>(<span class="params">params</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> orig = biliState.<span class="property">imgKey</span> + biliState.<span class="property">subKey</span>;</span><br><span class="line">  <span class="keyword">const</span> mixinKey = <span class="variable constant_">BILI_WBI_MIXIN_TAB</span>.<span class="title function_">map</span>(<span class="function"><span class="params">i</span> =&gt;</span> orig[i]).<span class="title function_">join</span>(<span class="string">&#x27;&#x27;</span>).<span class="title function_">slice</span>(<span class="number">0</span>, <span class="number">32</span>);</span><br><span class="line">  <span class="keyword">const</span> wts = <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>);</span><br><span class="line">  <span class="keyword">const</span> sorted = <span class="title class_">Object</span>.<span class="title function_">keys</span>(&#123; ...params, wts &#125;).<span class="title function_">sort</span>().<span class="title function_">map</span>(<span class="function"><span class="params">k</span> =&gt;</span> <span class="string">`<span class="subst">$&#123;k&#125;</span>=<span class="subst">$&#123;v&#125;</span>`</span>).<span class="title function_">join</span>(<span class="string">&#x27;&amp;&#x27;</span>);</span><br><span class="line">  <span class="keyword">const</span> wRid = <span class="title function_">createHash</span>(<span class="string">&#x27;md5&#x27;</span>).<span class="title function_">update</span>(sorted + mixinKey).<span class="title function_">digest</span>(<span class="string">&#x27;hex&#x27;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;sorted&#125;</span>&amp;w_rid=<span class="subst">$&#123;wRid&#125;</span>`</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-公平轮询算法-—-跨源-×-关键词双层调度"><a href="#3-公平轮询算法-—-跨源-×-关键词双层调度" class="headerlink" title="3. 公平轮询算法 — 跨源 × 关键词双层调度"></a>3. 公平轮询算法 — 跨源 × 关键词双层调度</h3><p><strong>问题</strong>：Bing 等高产源每次搜索返回 10+ 条结果，而 HackerNews、Twitter 可能只有 2-3 条。如果直接合并，高产源会淹没小众源。</p>
+<p><strong>解决方案</strong>：设计了「来源 × 关键词」双层公平轮询算法：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">第一层：每个来源内部，按关键词分组后轮询展平</span><br><span class="line">  → Bing: [AI编程_1, 大模型_1, AI编程_2, 大模型_2, ...]</span><br><span class="line"></span><br><span class="line">第二层：跨来源轮询，每源设置硬配额（max / 源数，不低于 minPerSource）</span><br><span class="line">  → [Bing_1, HN_1, Twitter_1, Sogou_1, Bing_2, HN_2, ...]</span><br></pre></td></tr></table></figure>
+
+<p>这样保证了每个来源至少有 4 条候选进入 AI 审核，避免了信息来源单一化。</p>
+<h3 id="4-AI-判别引擎-—-双模型容错"><a href="#4-AI-判别引擎-—-双模型容错" class="headerlink" title="4. AI 判别引擎 — 双模型容错"></a>4. AI 判别引擎 — 双模型容错</h3><p>采用 <strong>DeepSeek 为主、OpenRouter (GPT-4o-mini) 兜底</strong> 的双模型策略：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="keyword">await</span> <span class="title function_">callDeepSeek</span>(prompt);      <span class="comment">// 主力</span></span><br><span class="line"><span class="keyword">if</span> (!result) result = <span class="keyword">await</span> <span class="title function_">callOpenRouter</span>(prompt); <span class="comment">// 兜底</span></span><br></pre></td></tr></table></figure>
+
+<p>AI 对每条候选输出结构化 JSON：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;isHot&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;confidence&quot;</span><span class="punctuation">:</span> <span class="number">0.85</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;summary&quot;</span><span class="punctuation">:</span> <span class="string">&quot;该视频标题提及GPT-Image2，属于AI图像生成工具...&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;reason&quot;</span><span class="punctuation">:</span> <span class="string">&quot;内容为实战用法合集，符合社区热门讨论定义，且来源可靠&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>置信度阈值</strong>：<code>confidence &gt;= 0.4</code> 才会被收录为热点，避免低质量内容干扰。</p>
+<h3 id="5-去重策略"><a href="#5-去重策略" class="headerlink" title="5. 去重策略"></a>5. 去重策略</h3><p>在数据量大的场景下，去重是关键环节。系统采用<strong>三字段联合去重</strong>：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> key = <span class="string">`<span class="subst">$&#123;item.source&#125;</span>::<span class="subst">$&#123;normalizeUrl(item.url)&#125;</span>::<span class="subst">$&#123;item.title&#125;</span>`</span>;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>normalizeUrl</code> 会去除查询参数和 hash 片段，避免同一内容因 URL 参数不同而被重复收录。</p>
+<hr>
+<h2 id="前端架构与交互设计"><a href="#前端架构与交互设计" class="headerlink" title="前端架构与交互设计"></a>前端架构与交互设计</h2><h3 id="Bento-Grid-布局"><a href="#Bento-Grid-布局" class="headerlink" title="Bento Grid 布局"></a>Bento Grid 布局</h3><p>采用 Bento Grid（便当盒布局）设计，将监控配置、快速操作、热点列表、通知中心四大模块有机组合：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/%E7%83%AD%E7%82%B9%E9%80%9A%E7%9F%A5.jpg" alt="热点列表与通知面板"></p>
+<h3 id="热点卡片交互"><a href="#热点卡片交互" class="headerlink" title="热点卡片交互"></a>热点卡片交互</h3><p>每张热点卡片支持展开&#x2F;折叠，展示完整信息：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF%E5%B1%95%E5%BC%80.jpg" alt="卡片展开详情"></p>
+<p>展开后展示：</p>
+<ul>
+<li><strong>AI 判定理由</strong> — 为什么这条内容被判定为热点</li>
+<li><strong>详细信息</strong> — 收录时间、发布时间、触发方式、置信度精确值</li>
+<li><strong>原文链接</strong> — 一键复制 &#x2F; 新标签打开</li>
+</ul>
+<h3 id="排序与筛选系统"><a href="#排序与筛选系统" class="headerlink" title="排序与筛选系统"></a>排序与筛选系统</h3><p>支持 4 种排序维度：</p>
+<table>
+<thead>
+<tr>
+<th>排序方式</th>
+<th>逻辑</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>相关性</td>
+<td>有搜索词时按匹配度评分（标题 +5，摘要 +2，query 完全匹配 +8），否则按时间</td>
+</tr>
+<tr>
+<td>热度</td>
+<td>按 AI 置信度降序</td>
+</tr>
+<tr>
+<td>收录</td>
+<td>按扫描发现时间降序</td>
+</tr>
+<tr>
+<td>发布</td>
+<td>按信息源的原始发布时间降序</td>
+</tr>
+</tbody></table>
+<p>加上来源筛选（按来源 chip 过滤）和关键词搜索（多 token 匹配），形成完整的数据探索能力。</p>
+<h3 id="动画与视觉"><a href="#动画与视觉" class="headerlink" title="动画与视觉"></a>动画与视觉</h3><ul>
+<li><strong>WavyBackground</strong>：Canvas 绘制的多层正弦波浪动画，支持颜色、速度、透明度配置</li>
+<li><strong>FloatingParticles</strong>：浮动粒子背景，增加科技感</li>
+<li><strong>Sparkles</strong>：按钮 sparkle 效果，增强交互反馈</li>
+<li><strong>Framer Motion</strong>：卡片进入动画、折叠展开过渡、分页切换</li>
+</ul>
+<hr>
+<h2 id="后端架构"><a href="#后端架构" class="headerlink" title="后端架构"></a>后端架构</h2><h3 id="API-设计"><a href="#API-设计" class="headerlink" title="API 设计"></a>API 设计</h3><p>RESTful 风格，8 个核心端点：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">GET  /api/config        — 获取关键词与监控范围</span><br><span class="line">POST /api/keywords      — 添加关键词</span><br><span class="line">DEL  /api/keywords/:kw  — 删除关键词</span><br><span class="line">POST /api/scope         — 更新监控范围</span><br><span class="line">POST /api/scan          — 手动触发扫描</span><br><span class="line">GET  /api/hotspots      — 获取热点列表</span><br><span class="line">GET  /api/notifications — 获取通知记录</span><br><span class="line">POST /api/subscribe     — 浏览器推送订阅</span><br><span class="line">GET  /api/health        — 服务健康状态</span><br></pre></td></tr></table></figure>
+
+<h3 id="定时任务"><a href="#定时任务" class="headerlink" title="定时任务"></a>定时任务</h3><p>使用 <code>node-cron</code> 每 30 分钟自动执行扫描：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">cron.<span class="title function_">schedule</span>(<span class="string">&#x27;*/30 * * * *&#x27;</span>, <span class="title function_">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">scanHotspots</span>(<span class="string">&#x27;automatic&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据持久化"><a href="#数据持久化" class="headerlink" title="数据持久化"></a>数据持久化</h3><p>采用 JSON 文件存储（<code>data/</code> 目录），适合轻量级部署，无需数据库依赖：</p>
+<ul>
+<li><code>keywords.json</code> — 关键词配置 + 通知记录</li>
+<li><code>hotspots.json</code> — 热点列表（最多保留 120 条）</li>
+<li><code>subscriptions.json</code> — 浏览器推送订阅</li>
+</ul>
+<h3 id="通知系统"><a href="#通知系统" class="headerlink" title="通知系统"></a>通知系统</h3><p><strong>双通道通知</strong>：</p>
+<ol>
+<li><strong>浏览器 Web Push</strong> — 基于 VAPID 协议，通过 Service Worker 推送</li>
+<li><strong>邮件通知</strong> — 基于 nodemailer + SMTP，自动清理无效订阅</li>
+</ol>
+<hr>
+<h2 id="工程实践"><a href="#工程实践" class="headerlink" title="工程实践"></a>工程实践</h2><h3 id="容错设计"><a href="#容错设计" class="headerlink" title="容错设计"></a>容错设计</h3><ul>
+<li>每个抓取源独立超时，单源崩溃不影响全局</li>
+<li>AI 调用双模型容错，DeepSeek 失败自动切换 OpenRouter</li>
+<li>通知发送失败静默处理，不阻断主流程</li>
+</ul>
+<h3 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h3><ul>
+<li>抓取节流：关键词间 800ms 延迟，避免触发反爬</li>
+<li>前端分页：每页 10 条，避免大列表渲染压力</li>
+<li>Canvas 动画：requestAnimationFrame + DPR 适配，保证 60fps 流畅</li>
+</ul>
+<h3 id="部署方案"><a href="#部署方案" class="headerlink" title="部署方案"></a>部署方案</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 开发模式（前后端分离）</span></span><br><span class="line">npm start          <span class="comment"># 后端 :4000</span></span><br><span class="line">npm run dev        <span class="comment"># 前端 :5173，自动代理 /api</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生产模式（单端口托管）</span></span><br><span class="line">npm run build      <span class="comment"># Vite 构建 dist/</span></span><br><span class="line">npm run start:prod <span class="comment"># Express 托管前端 + API</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="项目数据"><a href="#项目数据" class="headerlink" title="项目数据"></a>项目数据</h2><p>经过一段时间的运行积累：</p>
+<ul>
+<li><strong>信息源</strong>：7 个</li>
+<li><strong>已发现热点</strong>：100+ 条</li>
+<li><strong>通知记录</strong>：50+ 条</li>
+<li><strong>覆盖平台</strong>：Bilibili、HackerNews、Twitter、Bing、搜狗、微信公众号</li>
+</ul>
+<hr>
+<h2 id="技术栈总结"><a href="#技术栈总结" class="headerlink" title="技术栈总结"></a>技术栈总结</h2><table>
+<thead>
+<tr>
+<th>层</th>
+<th>技术</th>
+<th>选型理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>前端框架</td>
+<td>React 18</td>
+<td>生态成熟，组件化开发效率高</td>
+</tr>
+<tr>
+<td>构建工具</td>
+<td>Vite 5</td>
+<td>极速 HMR，开发体验优秀</td>
+</tr>
+<tr>
+<td>样式方案</td>
+<td>Tailwind CSS 3</td>
+<td>原子化 CSS，快速迭代 UI</td>
+</tr>
+<tr>
+<td>动画</td>
+<td>Framer Motion</td>
+<td>声明式动画 API，与 React 深度集成</td>
+</tr>
+<tr>
+<td>后端框架</td>
+<td>Express 4</td>
+<td>轻量灵活，适合 API 服务</td>
+</tr>
+<tr>
+<td>AI 引擎</td>
+<td>DeepSeek API</td>
+<td>性价比高，中文理解能力强</td>
+</tr>
+<tr>
+<td>定时任务</td>
+<td>node-cron</td>
+<td>Cron 语法，零配置</td>
+</tr>
+<tr>
+<td>网页解析</td>
+<td>Cheerio</td>
+<td>服务端 jQuery，高效 HTML 解析</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="后续规划"><a href="#后续规划" class="headerlink" title="后续规划"></a>后续规划</h2><ol>
+<li><strong>数据可视化</strong> — 添加热点趋势图表，展示各来源的数据分布</li>
+<li><strong>多主题支持</strong> — 支持多套关键词配置，一键切换监控主题</li>
+<li><strong>向量搜索</strong> — 引入 embedding 做语义去重，提升去重精度</li>
+<li><strong>Chrome 插件</strong> — 浏览器扩展，实时查看最新热点</li>
+<li><strong>自动化部署</strong> — GitHub Actions CI&#x2F;CD，自动构建部署</li>
+</ol>
+<hr>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>这个项目让我完整经历了一个全栈产品从需求分析、架构设计、核心算法实现到部署上线的全过程。其中最有收获的几个点：</p>
+<ul>
+<li><strong>并发调度</strong>：<code>Promise.allSettled</code> + 独立超时的容错模式</li>
+<li><strong>公平轮询算法</strong>：双层轮询 + 硬配额的设计思路</li>
+<li><strong>AI 集成</strong>：结构化 prompt + 双模型容错的工程实践</li>
+<li><strong>前端体验</strong>：Bento 布局 + 卡片展开折叠 + 多维排序筛选</li>
+</ul>
+<p>项目已开源，欢迎交流。</p>
+<p>GitHub: <a target="_blank" rel="noopener" href="https://github.com/ChoSeitaku/sei-hot-monitor">github.com&#x2F;ChoSeitaku&#x2F;sei-hot-monitor</a></p>
+</article><div class="post-copyright"><div class="copyright-cc-box"><i class="anzhiyufont anzhiyu-icon-copyright"></i></div><div class="post-copyright__author_box"><a class="post-copyright__author_img" href="/" title="头像"><img class="post-copyright__author_img_back" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" title="头像" alt="头像"><img class="post-copyright__author_img_front" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" title="头像" alt="头像"></a><div class="post-copyright__author_name">长星拓</div><div class="post-copyright__author_desc">长星拓的博客</div></div><div class="post-copyright__post__info"><a class="post-copyright__original" title="该文章为原创文章，注意版权协议" href="https://choseitaku.github.io/2026/06/23/hotspot-monitor/">原创</a><a class="post-copyright-title"><span onclick="rm.copyPageUrl('https://choseitaku.github.io/2026/06/23/hotspot-monitor/')">热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘</span></a></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div class="rewardLeftButton"><div class="post-reward" onclick="anzhiyu.addRewardMask()"><div class="reward-button button--animated" title="赞赏作者"><i class="anzhiyufont anzhiyu-icon-hand-heart-fill"></i>打赏作者</div><div class="reward-main"><div class="reward-all"><span class="reward-title">感谢你赐予我前进的力量</span><ul class="reward-group"><li class="reward-item"><a href="/img/QR/wechat.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/QR/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/QR/alipay.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/QR/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul><a class="reward-main-btn" href="/about/#about-reward" target="_blank"><div class="reward-text">赞赏者名单</div><div class="reward-dec">因为你们的支持让我意识到写文章的价值🙏</div></a></div></div></div><div id="quit-box" onclick="anzhiyu.removeRewardMask()" style="display: none"></div></div><div class="shareRight"><div class="share-link mobile"><div class="share-qrcode"><div class="share-button" title="使用手机访问这篇文章"><i class="anzhiyufont anzhiyu-icon-qrcode"></i></div><div class="share-main"><div class="share-main-all"><div id="qrcode" title="https://choseitaku.github.io/2026/06/23/hotspot-monitor/"></div><div class="reward-dec">使用手机访问这篇文章</div></div></div></div></div><div class="share-link weibo"><a class="share-button" target="_blank" href="https://service.weibo.com/share/share.php?title=热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘&amp;url=https://choseitaku.github.io/2026/06/23/hotspot-monitor/&amp;pic=/img/random15.png" rel="external nofollow noreferrer noopener"><i class="anzhiyufont anzhiyu-icon-weibo"></i></a></div><script>function copyCurrentPageUrl() {
+  var currentPageUrl = window.location.href;
+  var input = document.createElement("input");
+  input.setAttribute("value", currentPageUrl);
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  document.body.removeChild(input);
+}</script><div class="share-link copyurl"><div class="share-button" id="post-share-url" title="复制链接" onclick="copyCurrentPageUrl()"><i class="anzhiyufont anzhiyu-icon-link"></i></div></div></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://choseitaku.github.io" target="_blank">长星拓的博客</a>！</span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__box"><div class="post-meta__box__tag-list"><a class="post-meta__box__tags" href="/tags/AI/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>AI<span class="tagsPageCount">5</span></a><a class="post-meta__box__tags" href="/tags/%E9%A1%B9%E7%9B%AE/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>项目<span class="tagsPageCount">4</span></a></div></div></div><div class="post_share"><div class="social-share" data-image="/img/random15.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"/><script src="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer="defer"></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2026/06/19/ai-visual-prompt-studio/"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random14.png" onerror="onerror=null;src='/img/random11.png'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="anzhiyufont anzhiyu-icon-thumbs-up fa-fw" style="font-size: 1.5rem; margin-right: 4px"></i><span>喜欢这篇文章的人也看了</span></div><div class="relatedPosts-list"><div><a href="/2026/06/12/x-article-ai-workflow/" title="x-article-ai-workflow：基于 AI 的全自动化内容创作流水线"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random12.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-06-12</div><div class="title">x-article-ai-workflow：基于 AI 的全自动化内容创作流水线</div></div></a></div><div><a href="/2026/06/15/star-health-helper/" title="从零构建「星拓健康助手」：一个浏览器端 AI 体态检测与健康习惯管理应用"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random13.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-06-15</div><div class="title">从零构建「星拓健康助手」：一个浏览器端 AI 体态检测与健康习惯管理应用</div></div></a></div><div><a href="/2026/06/19/ai-visual-prompt-studio/" title="从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random14.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-06-19</div><div class="title">从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路</div></div></a></div><div><a href="/2026/06/16/VibeCoding%E7%BB%8F%E9%AA%8C/" title="VibeCoding 实战指南：从入门到高效协作"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random09.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-06-16</div><div class="title">VibeCoding 实战指南：从入门到高效协作</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="author-info__sayhi" id="author-info__sayhi" onclick="anzhiyu.changeSayHelloText()"></div><div class="author-info-avatar"><img class="avatar-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-status"><img class="g-status" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://bu.dusays.com/2023/08/24/64e6ce9c507bb.png" alt="status"/></div></div><div class="author-info__description"><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);"><b style="color:#fff">00 后｜AI 全栈开发者</b></div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">AI 量化・AI 工作流・OPC<br>日语 & 英语双语｜自媒体创作者<br>副业深耕中，奔赴 A8 人生目标</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about"><h1 class="author-info__name">长星拓</h1><div class="author-info__desc">长星拓的博客</div></a><div class="card-info-social-icons is-center"><a class="social-icon faa-parent animated-hover" href="https://github.com/ChoSeitaku" target="_blank" title="Github"><i class="anzhiyufont anzhiyu-icon-github"></i></a><a class="social-icon faa-parent animated-hover" href="https://x.com/choseitaku" target="_blank" title="Twitter"><i class="anzhiyufont anzhiyu-icon-link"></i></a><a class="social-icon faa-parent animated-hover" href="https://blog.csdn.net/CoderZzz6310" target="_blank" title="CSDN"><i class="anzhiyufont anzhiyu-icon-link"></i></a></div></div></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bullhorn anzhiyu-shake"></i><span>公告</span></div><div class="announcement_content">📢 欢迎来到我的博客！这里记录技术思考与生活感悟，希望能为你带来有价值的启发。如有任何问题或想法，欢迎在评论区留言交流～</div></div><div class="card-widget anzhiyu-right-widget" id="card-wechat" onclick="null"><div id="flip-wrapper"><div id="flip-content"><div class="face" style="background: url(https://bu.dusays.com/2023/01/13/63c02edf44033.png) center center / 100% no-repeat"></div><div class="back face" style="background: url(https://bu.dusays.com/2023/05/13/645fa415e8694.png) center center / 100% no-repeat"></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bars"></i><span>文章目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%83%AD%E7%82%B9%E7%9E%AD%E6%9C%9B%E5%8F%B0-%E2%80%94-%E4%B8%80%E4%B8%AA%E5%85%A8%E6%A0%88-AI-%E7%83%AD%E7%82%B9%E7%9B%91%E6%8E%A7%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8A%80%E6%9C%AF%E5%A4%8D%E7%9B%98"><span class="toc-number">1.</span> <span class="toc-text">热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">项目概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%81%9A%E8%BF%99%E4%B8%AA%E9%A1%B9%E7%9B%AE"><span class="toc-number">1.2.</span> <span class="toc-text">为什么做这个项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E4%BA%AE%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">核心技术亮点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%A4%9A%E6%BA%90%E5%B9%B6%E5%8F%91%E6%8A%93%E5%8F%96%E6%9E%B6%E6%9E%84"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 多源并发抓取架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Bilibili-WBI-%E7%AD%BE%E5%90%8D%E9%80%86%E5%90%91"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. Bilibili WBI 签名逆向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%85%AC%E5%B9%B3%E8%BD%AE%E8%AF%A2%E7%AE%97%E6%B3%95-%E2%80%94-%E8%B7%A8%E6%BA%90-%C3%97-%E5%85%B3%E9%94%AE%E8%AF%8D%E5%8F%8C%E5%B1%82%E8%B0%83%E5%BA%A6"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. 公平轮询算法 — 跨源 × 关键词双层调度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-AI-%E5%88%A4%E5%88%AB%E5%BC%95%E6%93%8E-%E2%80%94-%E5%8F%8C%E6%A8%A1%E5%9E%8B%E5%AE%B9%E9%94%99"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. AI 判别引擎 — 双模型容错</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%8E%BB%E9%87%8D%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.5.</span> <span class="toc-text">5. 去重策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E6%9E%B6%E6%9E%84%E4%B8%8E%E4%BA%A4%E4%BA%92%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.4.</span> <span class="toc-text">前端架构与交互设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bento-Grid-%E5%B8%83%E5%B1%80"><span class="toc-number">1.4.1.</span> <span class="toc-text">Bento Grid 布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%83%AD%E7%82%B9%E5%8D%A1%E7%89%87%E4%BA%A4%E4%BA%92"><span class="toc-number">1.4.2.</span> <span class="toc-text">热点卡片交互</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%92%E5%BA%8F%E4%B8%8E%E7%AD%9B%E9%80%89%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.4.3.</span> <span class="toc-text">排序与筛选系统</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E4%B8%8E%E8%A7%86%E8%A7%89"><span class="toc-number">1.4.4.</span> <span class="toc-text">动画与视觉</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84"><span class="toc-number">1.5.</span> <span class="toc-text">后端架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#API-%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.5.1.</span> <span class="toc-text">API 设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-number">1.5.2.</span> <span class="toc-text">定时任务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-number">1.5.3.</span> <span class="toc-text">数据持久化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E7%9F%A5%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.5.4.</span> <span class="toc-text">通知系统</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="toc-number">1.6.</span> <span class="toc-text">工程实践</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E9%94%99%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.6.1.</span> <span class="toc-text">容错设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="toc-number">1.6.2.</span> <span class="toc-text">性能优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2%E6%96%B9%E6%A1%88"><span class="toc-number">1.6.3.</span> <span class="toc-text">部署方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E6%95%B0%E6%8D%AE"><span class="toc-number">1.7.</span> <span class="toc-text">项目数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E6%A0%88%E6%80%BB%E7%BB%93"><span class="toc-number">1.8.</span> <span class="toc-text">技术栈总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%BB%AD%E8%A7%84%E5%88%92"><span class="toc-number">1.9.</span> <span class="toc-text">后续规划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E6%9C%80%E5%90%8E"><span class="toc-number">1.10.</span> <span class="toc-text">写在最后</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-history"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/06/23/hotspot-monitor/" title="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random15.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘"/></a><div class="content"><a class="title" href="/2026/06/23/hotspot-monitor/" title="热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘">热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘</a><time datetime="2026-06-23T02:00:00.000Z" title="发表于 2026-06-23 10:00:00">2026-06-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/06/19/ai-visual-prompt-studio/" title="从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random14.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路"/></a><div class="content"><a class="title" href="/2026/06/19/ai-visual-prompt-studio/" title="从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路">从零打造 AI Visual Prompt Studio：一个全栈工程师的 AI 工具探索之路</a><time datetime="2026-06-19T02:00:00.000Z" title="发表于 2026-06-19 10:00:00">2026-06-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/06/16/VibeCoding%E7%BB%8F%E9%AA%8C/" title="VibeCoding 实战指南：从入门到高效协作"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random09.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="VibeCoding 实战指南：从入门到高效协作"/></a><div class="content"><a class="title" href="/2026/06/16/VibeCoding%E7%BB%8F%E9%AA%8C/" title="VibeCoding 实战指南：从入门到高效协作">VibeCoding 实战指南：从入门到高效协作</a><time datetime="2026-06-16T04:00:00.000Z" title="发表于 2026-06-16 12:00:00">2026-06-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/06/15/star-health-helper/" title="从零构建「星拓健康助手」：一个浏览器端 AI 体态检测与健康习惯管理应用"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random13.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="从零构建「星拓健康助手」：一个浏览器端 AI 体态检测与健康习惯管理应用"/></a><div class="content"><a class="title" href="/2026/06/15/star-health-helper/" title="从零构建「星拓健康助手」：一个浏览器端 AI 体态检测与健康习惯管理应用">从零构建「星拓健康助手」：一个浏览器端 AI 体态检测与健康习惯管理应用</a><time datetime="2026-06-15T02:00:00.000Z" title="发表于 2026-06-15 10:00:00">2026-06-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/06/12/x-article-ai-workflow/" title="x-article-ai-workflow：基于 AI 的全自动化内容创作流水线"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random12.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="x-article-ai-workflow：基于 AI 的全自动化内容创作流水线"/></a><div class="content"><a class="title" href="/2026/06/12/x-article-ai-workflow/" title="x-article-ai-workflow：基于 AI 的全自动化内容创作流水线">x-article-ai-workflow：基于 AI 的全自动化内容创作流水线</a><time datetime="2026-06-12T02:00:00.000Z" title="发表于 2026-06-12 10:00:00">2026-06-12</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div id="workboard"><img class="workSituationImg boardsign" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-上班摸鱼中.svg" alt="今天也是努力的一天~" title="今天也是努力的一天~"/><div id="runtimeTextTip"></div></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v7.3.0" title="博客框架为Hexo_v7.3.0"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Frame-Hexo.svg" alt="博客框架为Hexo_v7.3.0"/></a><a class="github-badge" target="_blank" href="https://github.com/ChoSeitaku" style="margin-inline:5px" data-title="本站使用安知鱼主题" title="本站使用安知鱼主题"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.9/img/Theme-AnZhiYu-2E67D3.svg" alt="本站使用安知鱼主题"/></a><a class="github-badge" target="_blank" href="https://github.com/ChoSeitaku" style="margin-inline:5px" data-title="本站项目由Github托管" title="本站项目由Github托管"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Source-Github.svg" alt="本站项目由Github托管"/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.2.0/img/badge/Copyright-BY-NC-SA.svg" alt="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"/></a></p></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div id="footer-bar-tips"><div class="copyright">&copy;2026 By <a class="footer-bar-link" href="/" title="长星拓" target="_blank">长星拓</a></div></div><div id="footer-type-tips"></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub">GitHub</a></div></div></div></footer></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="sidebar-site-data site-data is-center"><a href="/archives/" title="archive"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/" title="tag"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/" title="category"><div class="headline">分类</div><div class="length-num">4</div></a></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><a class="darkmode_switchbutton menu-child" href="javascript:void(0);" title="显示模式"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span>显示模式</span></a></div><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://choseitaku.github.io/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="博客"/><span class="back-menu-item-text">博客</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://x.com/choseitaku" title="Twitter"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="Twitter"/><span class="back-menu-item-text">Twitter</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://blog.csdn.net/CoderZzz6310" title="CSDN"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="CSDN"/><span class="back-menu-item-text">CSDN</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub"/><span class="back-menu-item-text">GitHub</span></a></div></div></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 文章</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/archives/"><i class="anzhiyufont anzhiyu-icon-box-archive faa-tada" style="font-size: 0.9em;"></i><span> 全部文章</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/categories/"><i class="anzhiyufont anzhiyu-icon-shapes faa-tada" style="font-size: 0.9em;"></i><span> 分类列表</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags faa-tada" style="font-size: 0.9em;"></i><span> 标签列表</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 我的</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/music/"><i class="anzhiyufont anzhiyu-icon-music faa-tada" style="font-size: 0.9em;"></i><span> 音乐馆</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/bangumis/"><i class="anzhiyufont anzhiyu-icon-bilibili faa-tada" style="font-size: 0.9em;"></i><span> 追番页</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/album/"><i class="anzhiyufont anzhiyu-icon-images faa-tada" style="font-size: 0.9em;"></i><span> 相册集</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/air-conditioner/"><i class="anzhiyufont anzhiyu-icon-fan faa-tada" style="font-size: 0.9em;"></i><span> 小空调</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/room/"><i class="anzhiyufont anzhiyu-icon-house-chimney faa-tada" style="font-size: 0.9em;"></i><span> 小房间</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 关于</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="javascript:toRandomPost()"><i class="anzhiyufont anzhiyu-icon-shoe-prints1 faa-tada" style="font-size: 0.9em;"></i><span> 随便逛逛</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/about/"><i class="anzhiyufont anzhiyu-icon-paper-plane faa-tada" style="font-size: 0.9em;"></i><span> 关于本人</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/AI/" style="font-size: 0.88rem;">AI<sup>5</sup></a><a href="/tags/Hexo/" style="font-size: 0.88rem;">Hexo<sup>1</sup></a><a href="/tags/%E5%BB%BA%E7%AB%99/" style="font-size: 0.88rem;">建站<sup>1</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 0.88rem;">随笔<sup>2</sup></a><a href="/tags/%E9%9D%A2%E7%BB%8F/" style="font-size: 0.88rem;">面经<sup>9</sup></a><a href="/tags/%E9%A1%B9%E7%9B%AE/" style="font-size: 0.88rem;">项目<sup>4</sup></a></div></div><hr/></div></div><div id="keyboard-tips"><div class="keyboardTitle">博客快捷键</div><div class="keybordList"><div class="keybordItem"><div class="keyGroup"><div class="key">shift K</div></div><div class="keyContent"><div class="content">关闭快捷键功能</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift A</div></div><div class="keyContent"><div class="content">打开/关闭中控台</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift M</div></div><div class="keyContent"><div class="content">播放/暂停音乐</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift D</div></div><div class="keyContent"><div class="content">深色/浅色显示模式</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift S</div></div><div class="keyContent"><div class="content">站内搜索</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift R</div></div><div class="keyContent"><div class="content">随机访问</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift H</div></div><div class="keyContent"><div class="content">返回首页</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift F</div></div><div class="keyContent"><div class="content">友链鱼塘</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift L</div></div><div class="keyContent"><div class="content">友链页面</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift P</div></div><div class="keyContent"><div class="content">关于本站</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift I</div></div><div class="keyContent"><div class="content">原版/本站右键菜单</div></div></div></div></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="anzhiyufont anzhiyu-icon-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="anzhiyufont anzhiyu-icon-gear"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="anzhiyufont anzhiyu-icon-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></button></div></div><div id="nav-music"><a id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()" accesskey="m">播放音乐</a><div id="console-music-bg"></div><meting-js id="17961799618" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random" volume="0.7"></meting-js><script>(function(){
+  var defaultSongId = '3346496288';
+  var checkInterval = setInterval(function(){
+    var aplayerEl = document.querySelector('#nav-music meting-js');
+    if (aplayerEl && aplayerEl.aplayer && aplayerEl.aplayer.list && aplayerEl.aplayer.list.audios.length > 0) {
+      clearInterval(checkInterval);
+      var audios = aplayerEl.aplayer.list.audios;
+      for (var i = 0; i < audios.length; i++) {
+        if (audios[i].id == defaultSongId) {
+          aplayerEl.aplayer.list.switch(i);
+          break;
+        }
+      }
+    }
+  }, 500);
+})();</script></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="anzhiyufont anzhiyu-icon-xmark"></i></button></nav><div class="is-center" id="loading-database"><i class="anzhiyufont anzhiyu-icon-spinner anzhiyu-pulse-icon"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="anzhiyufont anzhiyu-icon-arrow-left"></i></div><div class="rightMenu-item" id="menu-forward"><i class="anzhiyufont anzhiyu-icon-arrow-right"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="anzhiyufont anzhiyu-icon-arrow-rotate-right" style="font-size: 1rem;"></i></div><div class="rightMenu-item" id="menu-top"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="anzhiyufont anzhiyu-icon-paste"></i><span>粘贴文本</span></div><a class="rightMenu-item" id="menu-commenttext"><i class="anzhiyufont anzhiyu-icon-comment-medical"></i><span>引用到评论</span></a><div class="rightMenu-item" id="menu-newwindow"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="anzhiyufont anzhiyu-icon-link"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="anzhiyufont anzhiyu-icon-images"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="anzhiyufont anzhiyu-icon-download"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-newwindowimg"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开图片</span></div><div class="rightMenu-item" id="menu-search"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-searchBaidu"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>百度搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="anzhiyufont anzhiyu-icon-backward"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="anzhiyufont anzhiyu-icon-forward"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-playlist" onclick="window.open(&quot;https://music.163.com/#/playlist?id=17961799618&quot;, &quot;_blank&quot;);" style="display: none;"><i class="anzhiyufont anzhiyu-icon-radio"></i><span>查看所有歌曲</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item menu-link" id="menu-randomPost"><i class="anzhiyufont anzhiyu-icon-shuffle"></i><span>随便逛逛</span></a><a class="rightMenu-item menu-link" href="/categories/"><i class="anzhiyufont anzhiyu-icon-cube"></i><span>博客分类</span></a><a class="rightMenu-item menu-link" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags"></i><span>文章标签</span></a></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item" id="menu-copy" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制地址</span></a><a class="rightMenu-item" id="menu-commentBarrage" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-message"></i><span class="menu-commentBarrage-text">关闭热评</span></a><a class="rightMenu-item" id="menu-darkmode" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span class="menu-darkmode-text">深色模式</span></a><a class="rightMenu-item" id="menu-translate" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-language"></i><span>轉為繁體</span></a></div></div><div id="rightmenu-mask"></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.cbd.int/@fancyapps/ui@6.1.6/dist/fancybox/fancybox.umd.js"></script><script src="https://cdn.cbd.int/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://cdn.cbd.int/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.js"></script><canvas id="universe"></canvas><script async src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/dark/dark.js"></script><script>// 消除控制台打印
+var HoldLog = console.log;
+console.log = function () {};
+let now1 = new Date();
+queueMicrotask(() => {
+  const Log = function () {
+    HoldLog.apply(console, arguments);
+  }; //在恢复前输出日志
+  const grt = new Date("05/12/2026 00:00:00"); //此处修改你的建站时间或者网站上线时间
+  now1.setTime(now1.getTime() + 250);
+  const days = (now1 - grt) / 1000 / 60 / 60 / 24;
+  const dnum = Math.floor(days);
+  const ascll = [
+    `欢迎使用安知鱼!`,
+    `生活明朗, 万物可爱`,
+    `
+        
+       █████╗ ███╗   ██╗███████╗██╗  ██╗██╗██╗   ██╗██╗   ██╗
+      ██╔══██╗████╗  ██║╚══███╔╝██║  ██║██║╚██╗ ██╔╝██║   ██║
+      ███████║██╔██╗ ██║  ███╔╝ ███████║██║ ╚████╔╝ ██║   ██║
+      ██╔══██║██║╚██╗██║ ███╔╝  ██╔══██║██║  ╚██╔╝  ██║   ██║
+      ██║  ██║██║ ╚████║███████╗██║  ██║██║   ██║   ╚██████╔╝
+      ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝    ╚═════╝
+        
+        `,
+    "已上线",
+    dnum,
+    "天",
+    "©2026 By 安知鱼 V1.7.1",
+  ];
+  const ascll2 = [`NCC2-036`, `调用前置摄像头拍照成功，识别为【小笨蛋】.`, `Photo captured: `, `🤪`];
+
+  setTimeout(
+    Log.bind(
+      console,
+      `\n%c${ascll[0]} %c ${ascll[1]} %c ${ascll[2]} %c${ascll[3]}%c ${ascll[4]}%c ${ascll[5]}\n\n%c ${ascll[6]}\n`,
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      ""
+    )
+  );
+  setTimeout(
+    Log.bind(
+      console,
+      `%c ${ascll2[0]} %c ${ascll2[1]} %c \n${ascll2[2]} %c\n${ascll2[3]}\n`,
+      "color:white; background-color:#4fd953",
+      "",
+      "",
+      'background:url("https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/tinggge.gif") no-repeat;font-size:450%'
+    )
+  );
+
+  setTimeout(Log.bind(console, "%c WELCOME %c 你好，小笨蛋.", "color:white; background-color:#4f90d9", ""));
+
+  setTimeout(
+    console.warn.bind(
+      console,
+      "%c ⚡ Powered by 安知鱼 %c 你正在访问 长星拓 的博客.",
+      "color:white; background-color:#f0ad4e",
+      ""
+    )
+  );
+
+  setTimeout(Log.bind(console, "%c W23-12 %c 你已打开控制台.", "color:white; background-color:#4f90d9", ""));
+
+  setTimeout(
+    console.warn.bind(console, "%c S013-782 %c 你现在正处于监控中.", "color:white; background-color:#d9534f", "")
+  );
+});</script><script async src="/anzhiyu/random.js"></script><script async="async">(function () {
+  var grt = new Date("05/12/2026 00:00:00"); //设置网站上线时间
+  var now = new Date();
+  var dnum;
+  var hnum;
+  var mnum;
+  var snum;
+  var nowHour;
+
+  // 计算并更新天数、小时数、分钟数和秒数
+  function updateTime() {
+    now = new Date(); // 更新 now 的值
+    nowHour = now.getHours(); // 更新 nowHour 的值
+    var days = (now - grt) / 1000 / 60 / 60 / 24;
+    dnum = Math.floor(days);
+    var hours = (now - grt) / 1000 / 60 / 60 - 24 * dnum;
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+      hnum = "0" + hnum;
+    }
+    var minutes = (now - grt) / 1000 / 60 - 24 * 60 * dnum - 60 * hnum;
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+      mnum = "0" + mnum;
+    }
+    var seconds = (now - grt) / 1000 - 24 * 60 * 60 * dnum - 60 * 60 * hnum - 60 * mnum;
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+      snum = "0" + snum;
+    }
+  }
+
+  // 更新网页中显示的网站运行时间
+  function updateHtml() {
+    const footer = document.getElementById("footer");
+    if (!footer) return
+    let currentTimeHtml = "";
+    if (nowHour < 18 && nowHour >= 9) {
+      // 如果是上班时间，默认就是"安知鱼-上班摸鱼中.svg"图片，不需要更改
+      currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+    } else {
+      // 如果是下班时间，插入"安知鱼-下班啦.svg"图片
+      let img = document.querySelector("#workboard .workSituationImg");
+      if (img != null) {
+        img.src = "https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-下班啦.svg";
+        img.title = "休息时间，放松一下~";
+        img.alt = "休息时间，放松一下~";
+      }
+
+      currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+    }
+
+    if (document.getElementById("runtimeTextTip")) {
+      document.getElementById("runtimeTextTip").innerHTML = currentTimeHtml;
+    }
+  }
+
+  setInterval(() => {
+    updateTime();
+    updateHtml();
+  }, 1000);
+})();</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><input type="hidden" name="page-type" id="page-type" value="post"></div><script>var visitorMail = "";
+</script><script async data-pjax src="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/waterfall/waterfall.js"></script><script src="https://cdn.cbd.int/qrcodejs@1.0.0/qrcode.min.js"></script><script src="/js/anzhiyu/right_click_menu.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.9/icon/ali_iconfont_css.css"><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/aplayer/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.cbd.int/anzhiyu-blog-static@1.0.1/js/APlayer.min.js"></script><script src="https://cdn.cbd.int/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js"></script><script src="https://cdn.cbd.int/pjax@0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+  // removeEventListener scroll 
+  anzhiyu.removeGlobalFnEvent('pjax')
+  anzhiyu.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script charset="UTF-8" src="https://cdn.cbd.int/anzhiyu-theme-static@1.1.5/accesskey/accesskey.js"></script></div><div id="popup-window"><div class="popup-window-title">通知</div><div class="popup-window-divider"></div><div class="popup-window-content"><div class="popup-tip">你好呀</div><div class="popup-link"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i></div></div></div></body></html>
