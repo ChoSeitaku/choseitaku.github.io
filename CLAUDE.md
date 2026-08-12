@@ -54,6 +54,7 @@ cover: /img/random01.png
    - random13: 从零构建「星拓健康助手」：一个浏览器端 AI 体态检测与健康习惯管理应用
    - random14: 从零打造 AI Visual Prompt Studio：一个前端人的 AI 工具探索之路
    - random15: 热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘
+   - random17: Call of Code - AI 程序员闯关练兵场
 
 ## 删除文章
 
