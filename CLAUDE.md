@@ -55,6 +55,7 @@ cover: /img/random01.png
    - random14: 从零打造 AI Visual Prompt Studio：一个前端人的 AI 工具探索之路
    - random15: 热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘
    - random17: Call of Code - AI 程序员闯关练兵场
+   - random18: StarRAG - 商品资料知识库问答系统
 
 ## 删除文章
 
