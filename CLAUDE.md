@@ -56,6 +56,7 @@ cover: /img/random01.png
    - random15: 热点瞭望台 — 一个全栈 AI 热点监控系统的技术复盘
    - random17: Call of Code - AI 程序员闯关练兵场
    - random18: StarRAG - 商品资料知识库问答系统
+   - random10: 从零构建「装了吗」—— 一个 AI 驱动的开发者工具安装助手
 
 ## 删除文章
 
