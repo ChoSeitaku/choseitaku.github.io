@@ -57,6 +57,7 @@ cover: /img/random01.png
    - random17: Call of Code - AI 程序员闯关练兵场
    - random18: StarRAG - 商品资料知识库问答系统
    - random10: 从零构建「装了吗」—— 一个 AI 驱动的开发者工具安装助手
+   - random19: RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践
 
 ## 删除文章
 
