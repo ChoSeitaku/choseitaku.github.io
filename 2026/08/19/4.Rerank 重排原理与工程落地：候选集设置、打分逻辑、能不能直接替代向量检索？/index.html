@@ -1,0 +1,570 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？ | 长星拓的博客</title><meta name="keywords" content="RAG,Rerank,向量检索"><meta name="author" content="长星拓"><meta name="copyright" content="长星拓"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7f9fe"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-touch-fullscreen" content="yes"><meta name="apple-mobile-web-app-title" content="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"><meta name="application-name" content="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="#f7f9fe"><meta property="og:type" content="article"><meta property="og:title" content="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"><meta property="og:url" content="https://choseitaku.github.io/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/index.html"><meta property="og:site_name" content="长星拓的博客"><meta property="og:description" content="Rerank重排原理、打分逻辑、候选集配置、生产链路踩坑复盘，解答Rerank能不能直接替代向量检索"><meta property="og:locale" content="zh-CN"><meta property="og:image" content="https://choseitaku.github.io/img/random24.png"><meta property="article:author" content="长星拓"><meta property="article:tag" content="[&quot;博客&quot;,&quot;Hexo&quot;,&quot;安知鱼&quot;]"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://choseitaku.github.io/img/random24.png"><meta name="description" content="Rerank重排原理、打分逻辑、候选集配置、生产链路踩坑复盘，解答Rerank能不能直接替代向量检索"><link rel="shortcut icon" href="/img/siteicon/favicon.png"><link rel="canonical" href="https://choseitaku.github.io/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/"><link rel="preconnect" href="//cdn.cbd.int"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="xxx"/><meta name="baidu-site-verification" content="code-xxx"/><meta name="msvalidate.01" content="xxx"/><link rel="manifest" href="/manifest.json"/><meta name="msapplication-TileColor" content="var(--anzhiyu-main)"/><link rel="mask-icon" href="/img/siteicon/apple-icon-180.png" color="#5bbad5"/><link rel="apple-touch-icon" sizes="180x180" href="/img/siteicon/apple-icon-180.png"/><link rel="apple-touch-icon-precomposed" sizes="180x180" href="/img/siteicon/apple-icon-180.png"/><link rel="icon" type="image/png" sizes="32x32" href="/img/siteicon/32.png"/><link rel="icon" type="image/png" sizes="16x16" href="/img/siteicon/16.png"/><link rel="bookmark" href="/img/siteicon/apple-icon-180.png"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2224-1668.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2160-1620.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1290-2796.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2796-1290.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1179-2556.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2556-1179.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2778-1284.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2208-1242.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1334-750.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/@fancyapps/ui@6.1.6/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  linkPageTop: undefined,
+  peoplecanvas: {"enable":true,"img":"https://upload-bbs.miyoushe.com/upload/2024/07/27/125766904/ba62475f396df9de3316a08ed9e65d86_5680958632268053399..png","imgs":["/img/sprite-sheet.webp"]},
+  postHeadAiDescription: {"enable":true,"gptName":"AnZhiYu","mode":"local","switchBtn":false,"btnLink":"https://afdian.net/item/886a79d4db6711eda42a52540025c377","randomNum":3,"basicWordCount":1000,"key":"xxxx","Referer":"https://xx.xx/"},
+  diytitle: {"enable":true,"leaveTitle":"w(ﾟДﾟ)w 不要走！再看看嘛！","backTitle":"♪(^∇^*)欢迎肥来！"},
+  LA51: {"enable":true,"ck":null,"LingQueMonitorID":null},
+  greetingBox: {"enable":true,"default":"晚上好👋","list":[{"greeting":"晚安😴","startTime":0,"endTime":5},{"greeting":"早上好鸭👋, 祝你一天好心情！","startTime":6,"endTime":9},{"greeting":"上午好👋, 状态很好，鼓励一下～","startTime":10,"endTime":10},{"greeting":"11点多啦, 再坚持一下就吃饭啦～","startTime":11,"endTime":11},{"greeting":"午安👋","startTime":12,"endTime":14},{"greeting":"🌈充实的一天辛苦啦！","startTime":14,"endTime":18},{"greeting":"19点喽, 奖励一顿丰盛的大餐吧🍔","startTime":19,"endTime":19},{"greeting":"晚上好👋, 在属于自己的时间好好放松😌~","startTime":20,"endTime":24}]},
+  twikooEnvId: '',
+  commentBarrageConfig:undefined,
+  music_page_default: "nav_music",
+  root: '/',
+  preloader: {"source":3},
+  friends_vue_info: undefined,
+  navMusic: true,
+  navMusicId: '17961799618',
+  navMusicServer: 'netease',
+  mainTone: undefined,
+  authorStatus: {"skills":["💻 代码爱好者","📝 热爱写作分享","🚀 持续学习中"]},
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简","rightMenuMsgToTraditionalChinese":"转为繁体","rightMenuMsgToSimplifiedChinese":"转为简体"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":330},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    simplehomepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"copy":true,"copyrightEbable":false,"limitCount":50,"languages":{"author":"作者: 长星拓","link":"链接: ","source":"来源: 长星拓的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。","copySuccess":"复制成功，复制和转载请标注本文地址"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#425AEF","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.cbd.int/flickr-justified-gallery@2.2.0/dist/fjGallery.min.js',
+      css: 'https://cdn.cbd.int/flickr-justified-gallery@2.2.0/dist/fjGallery.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  shortcutKey: {"enable":true,"delay":100,"shiftDelay":200},
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  configTitle: '长星拓的博客',
+  title: 'Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？',
+  postAI: '',
+  pageFillDescription: 'Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？, 前言, 一、Rerank 重排底层原理与打分逻辑, 1. 原理, 2. 打分逻辑（BGE‑Reranker‑large）, 二、Rerank 在完整 RAG 链路中的位置, 存储链路, 查询链路完整片段, 三、候选集大小如何设置？生产环境权衡, 项目实战配置（StarRag）, 候选集设置核心权衡思路, 四、核心问题：Rerank 能不能直接替代向量检索？, 原因拆解, 什么场景可以 近似只用 Rerank？, 五、项目踩坑复盘, 六、Rerank 使用关键总结, ✨博客附加：配套面试真题（全部来源于两份原始文档）, Q1：Rerank 重排的底层原理是什么？Bi‑Encoder 和 Cross‑Encoder 区别？BGE‑Reranker 打分是什么含义？, Q2：你们项目 Rerank 放在链路哪个位置上游做了什么处理再送入 Rerank？, Q3：送入 Rerank 的候选集是不是越大越好？候选集大小怎么权衡？, Q4：Rerank 能不能直接替代向量检索？为什么？, Q5：Rerank 输出之后你们为什么不用固定 TopK而采用断崖检测动态截断？, Q6：Rerank 之后大模型依然忽略中间高分切片你们怎么处理？, Q7：Rerank 有哪些常见线上坑？, Q8：RRF 已经完成排序融合了为什么还需要再做 Rerank？, Q9：调参怎么验证 Rerank 相关改动是否生效？重排原理与工程落地候选集设置打分逻辑能不能直接替代向量检索本文基于线上落地企业知识库项目实战总结很多做的同学把当成万能特效药有的直接拿上万条候选丢给还有人想直接用替代向量检索本文结合项目踩坑实战讲清楚底层原理打分逻辑候选集大小怎么配置生产环境工程链路常见误区回答高频面试题能不能直接替代向量检索适合人群工程落地开发者准备大模型应用开发面试想要分清与生产级差异的同学项目技术栈前言在链路中重排是提升检索质量非常关键的一环网上经常简单演示向量召回一批结果直接丢给输出但上线生产环境之后会踩一堆坑候选集给的太大暴跌服务延迟飙升资源打满候选集太小把真正相关的文档提前过滤掉再强也救不回来搞不清打分逻辑看不懂输出分数代表什么产生误区既然语义理解能力更强那是不是可以跳过向量检索全部文档直接丢本文结合项目实战拆解原理打分逻辑候选集工程配置链路位置踩坑复盘解答能不能直接替代向量检索这个高频问题一重排底层原理与打分逻辑原理属于交叉编码器向量模型是双编码器和文档分开编码得到向量之后做相似度计算而是把拼接成一组输入模型内部做联合编码同时看到问题整篇文档上下文输出之间相关性分数文档分开编码速度快适合海量库做粗召回文档成对输入联合编码语义判断精度更高但速度慢算力开销大不适合海量文档遍历打分逻辑输出分数区间分数越接近和文档相关性越高分数越接近几乎完全不相关重点的分数是内部的相对分数不是全局绝对相似度同一个文档搭配不同分数会变化不能拿当做普适的全局阈值阈值要基于自己业务测试集标定我们项目经过业务测试经验阈值低于基本判定为无关断崖检测使用绝对差相对差作为截断经验值二在完整链路中的位置存储链路不参与写入入库阶段只作用于查询阶段不会生成向量存入向量库查询链路完整片段用户改写稠密稀疏多路并行检索倒数排名融合粗融合去重压缩候选集送入对每一条做交叉编码打分按分数降序排序断崖检测动态截断过滤低分过滤之后的候选切片送入生成答案工程铁律放在粗召回融合之后做精排不放在最前面三候选集大小如何设置生产环境权衡候选集过大开销暴涨延迟升高上不去候选集过小真正相关的文档在粗召回阶段就被丢弃没有机会挽救项目实战配置多路检索之后融合输出最多保留条本地知识库候选再合并网页检索结果整体给到的候选不超过条输出之后不写死固定使用断崖检测动态截断最少保留条最多保留条相邻文档分数绝对差或者相对差触发截断后面全部丢弃设置最低门槛分数低于直接丢弃全部候选都低于则触发拒答候选集设置核心权衡思路粗召回阶段要保证召回率优先把可能相关的文档尽量捞进来可以容忍混入噪声噪声交给过滤但是不能无限制放大候选数量每一条都要跑一次前向推理候选数量翻倍推理耗时几乎同步上涨离线评测调参基于自己业务测试集遍历不同候选数量观测服务延迟两个指标找到平衡点候选增大上升但延迟占用同步上升候选缩小延迟下降但存在丢失正确文档的风险误区直接把上百几百条候选全部丢进追求不漏任何一条线上会直接出现性能灾难四核心问题能不能直接替代向量检索结论生产环境不能直接替代只能作为精排组件原因拆解算力与性能瓶颈是推理开销很高假设知识库几十万如果跳过向量检索把全部文档和组成送入耗时会爆炸完全不满足线上接口响应要求向量库向量检索可以毫秒级在几十万百万级文档做粗筛不适合做海量库的全库遍历分工不一样向量检索负责大海捞针从几十万文档中快速捞出一小批有可能相关的候选负责小候选集合里面做精细的语义甄别区分哪些真正有用哪些是噪声类比向量检索相当于初试筛掉绝大多数人相当于复试只对通过初试的一小批人精细考核不能直接让几百万全部选手直接进复试什么场景可以近似只用只有文档数量非常小比如几十条以内的小才可以把全部文档丢企业级知识库达到几万几十万级别必须向量粗召回精排组合五项目踩坑复盘坑把上百条候选全部丢入追求不漏文档后果占用飙升接口延迟暴涨严重上不去解决上游多路召回做粗压缩控制输入的候选规模坑写死固定例如固定取后果简单问题带入大量噪声复杂问题证据不足解决输出后采用断崖检测动态截断配合最低相关性阈值过滤低分坑直接拿当做全局通用过滤阈值后果不同场景分数分布差异很大硬阈值会误杀有效片段或者放过噪声解决基于业务测试集标定经验阈值优先用断崖相对差值做截断辅以最低安全门槛坑跳过向量检索想直接全量替代召回后果文档量稍微变大服务完全不可用解决严格遵循向量粗召回融合精排链路坑输出结果不做任何过滤直接交给包含大量重复切片后果浪费算力重复文档抢占候选名额解决阶段做文档去重再送入坑认为可以修复上游召回完全没命中的问题后果正确文档根本没有进入候选集再强也无能为力解决只能改善已经进入候选池的文档排序不能把没有召回出来的文档凭空变出来六使用关键总结是交叉编码器做成对联合编码语义判别精度高但算力开销大适合小候选集精排不适合海量文档遍历分数是相对分数不是全局绝对相似度不能直接拿通用阈值硬套所有业务工程链路多路向量粗召回融合去重压缩候选重排断崖动态截断过滤低分候选集大小是召回率和性能的权衡要结合测试集指标线上延迟综合确定不要一味追求越大越好不能替代向量粗召回只能对已经捞出来的候选做重排正确文档如果上游没有被召回救不回来不要写死固定优先采用断崖检测动态截断兼顾简单复杂不同查询场景博客附加配套面试真题全部来源于两份原始文档题干来源尚硅谷全能开发技术之企业面试真题尚硅谷全能开发技术之高频面试题重排的底层原理是什么和区别打分是什么含义面试回答属于交叉编码器例如文档分开独立编码生成向量之后计算相似度速度很快适合海量知识库粗召回把拼接成对输入模型做联合编码同时看到问题和整篇文档语义相关性判断精度更高缺点推理算力开销大速度慢不适合海量文档遍历输出分数范围分数越高代表这一组相关性越高这个分数是内相对分数不是全局绝对相似度同一个文档搭配不同分数会变化不能直接拿当做所有业务的通用全局阈值我们项目业务经验低于基本视为无关你们项目放在链路哪个位置上游做了什么处理再送入面试回答不会直接把原始多路召回结果直接丢链路顺序用户改写稠密稀疏多路并行检索倒数排名融合做文档去重压缩候选集合再合并网络检索结果之后送入上游的作用是廉价粗融合去重把候选数量降下来控制送入的文档条数防止候选太多导致压力大接口延迟飙升送入的候选集是不是越大越好候选集大小怎么权衡面试回答不是越大越好候选集大可以提升更不容易漏掉潜在相关文档但是每一条都要做推理候选数量上涨消耗接口延迟会同步上涨线上会被限制候选集太小会出现正确文档在粗召回阶段就被丢弃再强也没有机会处理我们项目融合后本地候选最多条加上结果整体给到不超过条调参方式使用离线测试集观测和接口延迟两个指标找到业务平衡点不能单方面追求召回率不顾线上性能能不能直接替代向量检索为什么面试回答企业级生产知识库不能直接替代只适合几十条以内极小原因两点是推理开销很高如果知识库几万几十万全部文档和组成送入耗时爆炸完全达不到线上接口性能要求向量检索可以毫秒级完成海量文档粗筛两者分工不同向量粗召回负责从海量库里面捞出一小批潜在相关候选负责在这一小批候选里面做精细语义甄别类比初试和复试不能让全部选手直接进复试补充只能对已经进入候选池的文档改变排序上游没有召回出来的正确文档无法凭空生成出来输出之后你们为什么不用固定而采用断崖检测动态截断面试回答写死固定会出现两难简单问题带入大量噪声增加幻觉风险复杂业务查询证据又不够我们项目输出文档按分数降序采用断崖检测动态截断最少保留条最多保留条当相邻切片分数出现绝对差或者相对差触发断崖截断后面全部丢弃同时设置最低安全阈值全部低于阈值直接拒答简单问题自动少保留切片减少噪声复杂问题自动保留更多有效证据之后大模型依然忽略中间高分切片你们怎么处理原题出处文档面试原题面试回答第一依靠打分保证高相关性的切片尽量排在列表靠前的位置第二显式约束大模型逐条阅读全部参考资料禁止只看首尾片段第三配合断崖检测过滤掉大量低分噪声减少无关内容干扰必要场景可以做切片回填把子块对应的父章节补充进上下文有哪些常见线上坑面试回答候选集给的太大占用高延迟暴涨上不去上游一定要做候选压缩直接硬编码全局通用分数阈值不同分数分布不一样容易误杀有效片段或者放过噪声需要基于业务测试集标定阈值误以为可以拯救上游召回失败正确文档没进入候选池无能为力输入存在大量重复浪费算力阶段需要做文档去重直接用替换向量检索知识库文档一多服务性能直接崩盘已经完成排序融合了为什么还需要再做原题出处文档知识库检索排序章节面试回答是基于文档排名做的粗融合算法它并不理解和文档真实语义只利用各路召回输出的排名做计算会存在排名靠前但是语义实际不相关的噪声文档做交叉编码真正理解两者语义相关性是整条检索链路很关键的矫正阀门哪怕排序不理想也可以把真正相关的文档拉高排序把语义无关的文档打低分压低为后续动态截断提供可靠分数依据调参怎么验证相关改动是否生效原题出处文档评测分析章节面试回答不能拿少数几条主观感受判断使用固定离线测试集调参前后跑同一套数据重点观测两个指标同时关注接口延迟利用率这类性能指标不能只看召回效果忽略性能观察集合原有问题样本是否修复有没有大批量新增离线验证通过之后再做线上小流量灰度采样线上指标和离线结论对齐才确认改动生效',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2026-09-05 10:09:56',
+  postMainColor: '',
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#18171d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f7f9fe')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body data-type="anzhiyu"><div id="web_bg"></div><div id="an_music_bg"></div><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><img class="loading-img nolazyload" alt="加载头像" src="/img/item/avatar.webp"/><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.getElementById('loading-box').classList.add("loaded");
+  },
+  initLoading: () => {
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+setTimeout(function(){preloader.endLoading();},10000)
+
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.10/progress_bar/progress_bar.css"/><script async="async" src="https://cdn.cbd.int/pace-js@1.2.4/pace.min.js" data-pace-options="{ &quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}"></script><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: url('/img/random24.png') center/contain no-repeat"><nav id="nav"><div id="nav-group"><span id="blog_name"><div class="back-home-button"><i class="anzhiyufont anzhiyu-icon-grip-vertical"></i><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://choseitaku.github.io/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="博客"/><span class="back-menu-item-text">博客</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://x.com/choseitaku" title="Twitter"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="Twitter"/><span class="back-menu-item-text">Twitter</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://blog.csdn.net/CoderZzz6310" title="CSDN"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="CSDN"/><span class="back-menu-item-text">CSDN</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub"/><span class="back-menu-item-text">GitHub</span></a></div></div></div></div><a id="site-name" href="/" accesskey="h"><div class="title">长星拓的博客</div><i class="anzhiyufont anzhiyu-icon-house-chimney"></i></a><div id="he-plugin-simple"></div><script>var WIDGET = {
+  "CONFIG": {
+    "modules": "0124",
+    "background": "2",
+    "tmpColor": "FFFFFF",
+    "tmpSize": "16",
+    "cityColor": "FFFFFF",
+    "citySize": "16",
+    "aqiColor": "E8D87B",
+    "aqiSize": "16",
+    "weatherIconSize": "24",
+    "alertIconSize": "18",
+    "padding": "10px 10px 10px 10px",
+    "shadow": "0",
+    "language": "auto",
+    "borderRadius": "20",
+    "fixed": "true",
+    "vertical": "top",
+    "horizontal": "left",
+    "left": "20",
+    "top": "7.1",
+    "key": "df245676fb434a0691ead1c63341cd94"
+  }
+}
+</script><link rel="stylesheet" href="https://widget.qweather.net/simple/static/css/he-simple.css?v=1.4.0"/><script src="https://widget.qweather.net/simple/static/js/he-simple.js?v=1.4.0"></script></span><div class="mask-name-container"><div id="name-container"><a id="page-name" href="javascript:anzhiyu.scrollToDest(0, 500)">PAGE_NAME</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 文章</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/archives/"><i class="anzhiyufont anzhiyu-icon-box-archive faa-tada" style="font-size: 0.9em;"></i><span> 全部文章</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/categories/"><i class="anzhiyufont anzhiyu-icon-shapes faa-tada" style="font-size: 0.9em;"></i><span> 分类列表</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags faa-tada" style="font-size: 0.9em;"></i><span> 标签列表</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 我的</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/music/"><i class="anzhiyufont anzhiyu-icon-music faa-tada" style="font-size: 0.9em;"></i><span> 音乐馆</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/bangumis/"><i class="anzhiyufont anzhiyu-icon-bilibili faa-tada" style="font-size: 0.9em;"></i><span> 追番页</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/album/"><i class="anzhiyufont anzhiyu-icon-images faa-tada" style="font-size: 0.9em;"></i><span> 相册集</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/air-conditioner/"><i class="anzhiyufont anzhiyu-icon-fan faa-tada" style="font-size: 0.9em;"></i><span> 小空调</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/room/"><i class="anzhiyufont anzhiyu-icon-house-chimney faa-tada" style="font-size: 0.9em;"></i><span> 小房间</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 关于</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="javascript:toRandomPost()"><i class="anzhiyufont anzhiyu-icon-shoe-prints1 faa-tada" style="font-size: 0.9em;"></i><span> 随便逛逛</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/about/"><i class="anzhiyufont anzhiyu-icon-paper-plane faa-tada" style="font-size: 0.9em;"></i><span> 关于本人</span></a></li></ul></div></div></div><div id="nav-right"><div class="nav-button only-home" id="travellings_button" title="随机前往一个开往项目网站"><a class="site-page" onclick="anzhiyu.totraveling()" title="随机前往一个开往项目网站" href="javascript:void(0);" rel="external nofollow" data-pjax-state="external"><i class="anzhiyufont anzhiyu-icon-train"></i></a></div><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机前往一个文章" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-dice"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索🔍" accesskey="s"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span> 搜索</span></a></div><input id="center-console" type="checkbox"/><label class="widget" for="center-console" title="中控台" onclick="anzhiyu.switchConsole();"><i class="left"></i><i class="widget center"></i><i class="widget right"></i></label><div id="console"><div class="console-card-group-reward"><ul class="reward-all console-card"><li class="reward-item"><a href="/img/QR/wechat.jpg" target="_blank"><img class="post-qr-code-img" alt="微信" src="/img/QR/wechat.jpg"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/QR/alipay.jpg" target="_blank"><img class="post-qr-code-img" alt="支付宝" src="/img/QR/alipay.jpg"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div><div class="console-card-group"><div class="console-card-group-left"><div class="console-card" id="card-newest-comments"><div class="card-content"><div class="author-content-item-tips">互动</div><span class="author-content-item-title"> 最新评论</span></div><div class="aside-list"><span>正在加载中...</span></div></div></div><div class="console-card-group-right"><div class="console-card tags"><div class="card-content"><div class="author-content-item-tips">兴趣点</div><span class="author-content-item-title">寻找你感兴趣的领域</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/AI/" style="font-size: 1.05rem;">AI<sup>11</sup></a><a href="/tags/BGE-M3/" style="font-size: 1.05rem;">BGE-M3<sup>1</sup></a><a href="/tags/Electron/" style="font-size: 1.05rem;">Electron<sup>1</sup></a><a href="/tags/FastAPI/" style="font-size: 1.05rem;">FastAPI<sup>1</sup></a><a href="/tags/Hexo/" style="font-size: 1.05rem;">Hexo<sup>1</sup></a><a href="/tags/Java/" style="font-size: 1.05rem;">Java<sup>1</sup></a><a href="/tags/LangGraph/" style="font-size: 1.05rem;">LangGraph<sup>2</sup></a><a href="/tags/Milvus/" style="font-size: 1.05rem;">Milvus<sup>3</sup></a><a href="/tags/Python/" style="font-size: 1.05rem;">Python<sup>1</sup></a><a href="/tags/RAG/" style="font-size: 1.05rem;">RAG<sup>4</sup></a><a href="/tags/Rerank/" style="font-size: 1.05rem;">Rerank<sup>1</sup></a><a href="/tags/Spring-Cloud/" style="font-size: 1.05rem;">Spring Cloud<sup>1</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 1.05rem;">向量数据库<sup>2</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/" style="font-size: 1.05rem;">向量检索<sup>1</sup></a><a href="/tags/%E5%B9%BB%E8%A7%89/" style="font-size: 1.05rem;">幻觉<sup>1</sup></a><a href="/tags/%E5%BB%BA%E7%AB%99/" style="font-size: 1.05rem;">建站<sup>1</sup></a><a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 1.05rem;">开发工具<sup>1</sup></a><a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 1.05rem;">微服务<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%95%86/" style="font-size: 1.05rem;">电商<sup>1</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.05rem;">随笔<sup>2</sup></a><a href="/tags/%E9%9D%A2%E7%BB%8F/" style="font-size: 1.05rem;">面经<sup>9</sup></a><a href="/tags/%E9%A1%B9%E7%9B%AE/" style="font-size: 1.05rem;">项目<sup>6</sup></a></div></div><hr/></div></div><div class="console-card history"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-box-archiv"></i><span>文章</span></div><div class="card-archives"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/08/"><span class="card-archive-list-date">八月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">5</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/07/"><span class="card-archive-list-date">七月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">2</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/06/"><span class="card-archive-list-date">六月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">11</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/05/"><span class="card-archive-list-date">五月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">6</span><span>篇</span></div></a></li></ul></div><hr/></div></div></div><div class="button-group"><div class="console-btn-item"><a class="darkmode_switchbutton" title="显示模式切换" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-moon"></i></a></div><div class="console-btn-item" id="consoleHideAside" onclick="anzhiyu.hideAsideBtn()" title="边栏显示控制"><a class="asideSwitch"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></a></div><div class="console-btn-item" id="consoleMusic" onclick="anzhiyu.musicToggle()" title="音乐开关"><a class="music-switch"><i class="anzhiyufont anzhiyu-icon-music"></i></a></div><div class="console-btn-item" id="consoleKeyboard" onclick="anzhiyu.keyboardToggle()" title="快捷键开关"><a class="keyboard-switch"><i class="anzhiyufont anzhiyu-icon-keyboard"></i></a></div></div><div class="console-mask" onclick="anzhiyu.hideConsole()" href="javascript:void(0);"></div></div><div class="nav-button" id="nav-totop"><a class="totopbtn" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i><span id="percent" onclick="anzhiyu.scrollToDest(0,500)">0</span></a></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);" title="切换"><i class="anzhiyufont anzhiyu-icon-bars"></i></a></div></div></div></nav><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original">原创</a><span class="post-meta-categories"><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/RAG-%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url">RAG 工程实践</a></span><span class="article-meta tags"><a class="article-meta__tags" href="/tags/RAG/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>RAG</span></a><a class="article-meta__tags" href="/tags/Rerank/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>Rerank</span></a><a class="article-meta__tags" href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>向量检索</span></a></span></div></div><h1 class="post-title" itemprop="name headline">Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="anzhiyufont anzhiyu-icon-calendar-days post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" itemprop="dateCreated datePublished" datetime="2026-08-19T02:00:00.000Z" title="发表于 2026-08-19 10:00:00">2026-08-19</time><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-history post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" itemprop="dateCreated datePublished" datetime="2026-09-05T02:09:56.873Z" title="更新于 2026-09-05 10:09:56">2026-09-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator"></span><span class="post-meta-pv-cv" id="" data-flag-title="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"><i class="anzhiyufont anzhiyu-icon-fw-eye post-meta-icon"></i><span class="post-meta-label" title="阅读量">阅读量:</span><span id="busuanzi_value_page_pv"><i class="anzhiyufont anzhiyu-icon-spinner anzhiyu-spin"></i></span></span><span class="post-meta-separator">       </span><span class="post-meta-position" title="作者IP属地为深圳"><i class="anzhiyufont anzhiyu-icon-location-dot"></i>深圳</span></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section><div id="post-top-cover"><img class="nolazyload" id="post-top-bg" src="/img/random24.png"></div></header><main id="blog-container"><div class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container" itemscope itemtype="https://choseitaku.github.io/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/"><header><a class="post-meta-categories" href="/categories/RAG-%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url">RAG 工程实践</a><a href="/tags/RAG/" tabindex="-1" itemprop="url">RAG</a><a href="/tags/Rerank/" tabindex="-1" itemprop="url">Rerank</a><a href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/" tabindex="-1" itemprop="url">向量检索</a><h1 id="CrawlerTitle" itemprop="name headline">Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</h1><span itemprop="author" itemscope itemtype="http://schema.org/Person">长星拓</span><time itemprop="dateCreated datePublished" datetime="2026-08-19T02:00:00.000Z" title="发表于 2026-08-19 10:00:00">2026-08-19</time><time itemprop="dateCreated datePublished" datetime="2026-09-05T02:09:56.873Z" title="更新于 2026-09-05 10:09:56">2026-09-05</time></header><h1 id="Rerank-重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"><a href="#Rerank-重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？" class="headerlink" title="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"></a>Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</h1><blockquote>
+<p>📌 本文基于线上落地<strong>StarRag企业知识库项目</strong>实战总结。很多做 RAG 的同学把 Rerank 当成 “万能特效药”，有的直接拿上万条候选丢给 Rerank，还有人想直接用 Rerank 替代向量检索。本文结合项目踩坑实战，讲清楚 Rerank 底层原理、打分逻辑、候选集大小怎么配置、生产环境工程链路、常见误区，回答高频面试题：Rerank 能不能直接替代向量检索。</p>
+<p>🔖适合人群：RAG 工程落地开发者、准备大模型应用开发面试、想要分清 Demo 与生产级 RAG 差异的同学。</p>
+</blockquote>
+<p>项目技术栈：<code>FastAPI + LangGraph + Milvus + BGE‑M3 + BGE‑Reranker‑large + MinIO + MongoDB</code></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 RAG 链路中，Rerank（重排）是提升检索质量非常关键的一环。网上 Demo 经常简单演示：向量召回一批结果，直接丢给 Rerank 输出 Top‑N。 但上线生产环境之后会踩一堆坑：</p>
+<ol>
+<li>候选集给的太大，QPS 暴跌、服务延迟飙升，GPU 资源打满；</li>
+<li>候选集太小，把真正相关的文档提前过滤掉，Rerank 再强也救不回来；</li>
+<li>搞不清 Rerank 打分逻辑，看不懂输出分数代表什么；</li>
+<li>产生误区：既然 Rerank 语义理解能力更强，那是不是可以跳过向量检索，全部文档直接丢 Rerank？</li>
+</ol>
+<p>本文结合StarRag项目实战，拆解 Rerank 原理、打分逻辑、候选集工程配置、链路位置、踩坑复盘，解答 “Rerank 能不能直接替代向量检索” 这个高频问题。</p>
+<h2 id="一、Rerank-重排底层原理与打分逻辑"><a href="#一、Rerank-重排底层原理与打分逻辑" class="headerlink" title="一、Rerank 重排底层原理与打分逻辑"></a>一、Rerank 重排底层原理与打分逻辑</h2><h3 id="1-原理"><a href="#1-原理" class="headerlink" title="1. 原理"></a>1. 原理</h3><p>Reranker 属于<strong>交叉编码器（Cross‑Encoder）</strong>。 向量 Embedding 模型（BGE‑M3）是<strong>双编码器（Bi‑Encoder）</strong>：Query 和文档分开编码，得到向量之后做相似度计算。 而 Cross‑Encoder Rerank 是把<code>[query, document]</code>拼接成一组 pair，输入模型内部做联合编码，<strong>同时看到问题 + 整篇文档上下文</strong>，输出 0‑1 之间相关性分数。</p>
+<blockquote>
+<p>Bi‑Encoder：query、文档分开编码 → 速度快，适合海量库做粗召回； Cross‑Encoder：query + 文档成对输入联合编码 → 语义判断精度更高，但<strong>速度慢、算力开销大，不适合海量文档遍历</strong>。</p>
+</blockquote>
+<h3 id="2-打分逻辑（BGE‑Reranker‑large）"><a href="#2-打分逻辑（BGE‑Reranker‑large）" class="headerlink" title="2. 打分逻辑（BGE‑Reranker‑large）"></a>2. 打分逻辑（BGE‑Reranker‑large）</h3><p>输出分数区间<code>0 ~ 1</code>：</p>
+<ul>
+<li>分数越接近 1：query 和文档相关性越高；</li>
+<li>分数越接近 0：几乎完全不相关。</li>
+</ul>
+<p>⚠️重点：<strong>Rerank 的分数是 pair 内部的相对分数，不是全局绝对相似度</strong>。 同一个文档，搭配不同 query，分数会变化；不能拿 0.5 当做普适的全局阈值，阈值要基于自己业务测试集标定。</p>
+<blockquote>
+<p>我们StarRag项目经过业务测试，经验阈值：低于 0.3 基本判定为无关；断崖检测使用**绝对差 0.5、相对差 25%**作为截断经验值。</p>
+</blockquote>
+<h2 id="二、Rerank-在完整-RAG-链路中的位置"><a href="#二、Rerank-在完整-RAG-链路中的位置" class="headerlink" title="二、Rerank 在完整 RAG 链路中的位置"></a>二、Rerank 在完整 RAG 链路中的位置</h2><h3 id="存储链路"><a href="#存储链路" class="headerlink" title="存储链路"></a>存储链路</h3><blockquote>
+<p>Rerank<strong>不参与写入、入库阶段，只作用于查询阶段</strong>，不会生成向量存入向量库。</p>
+</blockquote>
+<h3 id="查询链路完整片段"><a href="#查询链路完整片段" class="headerlink" title="查询链路完整片段"></a>查询链路完整片段</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">用户Query → Query改写</span><br><span class="line">    ↓</span><br><span class="line">BGE‑M3 稠密+稀疏多路并行检索</span><br><span class="line">    ↓</span><br><span class="line">RRF倒数排名融合（粗融合、去重，压缩候选集）</span><br><span class="line">    ↓</span><br><span class="line">【送入Rerank】对每一条 &lt;query‑doc&gt; pair做交叉编码打分</span><br><span class="line">    ↓</span><br><span class="line">按分数降序排序 + 断崖检测动态截断过滤低分</span><br><span class="line">    ↓</span><br><span class="line">过滤之后的候选切片送入LLM生成答案</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>💡工程铁律：<strong>Rerank 放在粗召回、RRF 融合之后，做精排，不放在最前面。</strong></p>
+</blockquote>
+<h2 id="三、候选集大小如何设置？生产环境权衡"><a href="#三、候选集大小如何设置？生产环境权衡" class="headerlink" title="三、候选集大小如何设置？生产环境权衡"></a>三、候选集大小如何设置？生产环境权衡</h2><blockquote>
+<p>候选集过大：GPU 开销暴涨、延迟升高，QPS 上不去； 候选集过小：真正相关的文档在粗召回阶段就被丢弃，Rerank 没有机会挽救。</p>
+</blockquote>
+<h3 id="项目实战配置（StarRag）"><a href="#项目实战配置（StarRag）" class="headerlink" title="项目实战配置（StarRag）"></a>项目实战配置（StarRag）</h3><ol>
+<li>多路检索之后，RRF 融合输出<strong>最多保留 20 条本地知识库候选</strong>；再合并 MCP 网页检索结果，整体给到 Rerank 的候选不超过 25 条。</li>
+<li>Rerank 输出之后，不写死固定 TopK，使用<strong>断崖检测动态截断</strong>：最少保留 6 条，最多保留 15 条。<ul>
+<li>相邻文档分数<strong>绝对差 0.5 或者相对差 25%</strong>，触发截断，后面全部丢弃；</li>
+<li>设置最低门槛：分数低于 0.3 直接丢弃，全部候选都低于 0.3 则触发拒答。</li>
+</ul>
+</li>
+</ol>
+<h3 id="候选集设置核心权衡思路"><a href="#候选集设置核心权衡思路" class="headerlink" title="候选集设置核心权衡思路"></a>候选集设置核心权衡思路</h3><ol>
+<li>粗召回阶段要保证<strong>召回率优先</strong>：把可能相关的文档尽量捞进来，可以容忍混入噪声；噪声交给 Rerank 过滤。</li>
+<li>但是不能无限制放大候选数量：Rerank 每一条 pair 都要跑一次前向推理，候选数量翻倍，推理耗时几乎同步上涨。</li>
+<li>离线评测调参：基于自己业务测试集，遍历不同候选数量，观测<code>context_recall</code>、服务 P95 延迟两个指标，找到平衡点。<ul>
+<li>候选增大：context_recall 上升，但延迟、GPU 占用同步上升；</li>
+<li>候选缩小：延迟下降，但存在丢失正确文档的风险。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>误区：直接把上百、几百条候选全部丢进 Rerank，追求 “不漏任何一条”，线上会直接出现性能灾难。</p>
+</blockquote>
+<h2 id="四、核心问题：Rerank-能不能直接替代向量检索？"><a href="#四、核心问题：Rerank-能不能直接替代向量检索？" class="headerlink" title="四、核心问题：Rerank 能不能直接替代向量检索？"></a>四、核心问题：Rerank 能不能直接替代向量检索？</h2><p><strong>结论：生产环境不能直接替代，只能作为精排组件。</strong></p>
+<h3 id="原因拆解"><a href="#原因拆解" class="headerlink" title="原因拆解"></a>原因拆解</h3><ol>
+<li><strong>算力与性能瓶颈</strong> Rerank 是 Cross‑Encoder，推理开销很高。假设知识库几十万 chunk，如果跳过向量检索，把全部文档和 query 组成 pair 送入 Rerank，耗时会爆炸，完全不满足线上接口响应要求。 向量库 Bi‑Encoder 向量检索可以毫秒级在几十万、百万级文档做粗筛。Rerank 不适合做海量库的全库遍历。</li>
+<li><strong>分工不一样</strong></li>
+</ol>
+<ul>
+<li>向量检索（Bi‑Encoder）：负责大海捞针，从几十万文档中，快速捞出一小批 “有可能相关” 的候选；</li>
+<li>Rerank（Cross‑Encoder）：负责小候选集合里面，做精细的语义甄别，区分哪些真正有用，哪些是噪声。</li>
+</ul>
+<blockquote>
+<p>类比：向量检索相当于初试，筛掉绝大多数人；Rerank 相当于复试，只对通过初试的一小批人精细考核。不能直接让几百万全部选手直接进复试。</p>
+</blockquote>
+<h3 id="什么场景可以-“近似只用-Rerank”？"><a href="#什么场景可以-“近似只用-Rerank”？" class="headerlink" title="什么场景可以 “近似只用 Rerank”？"></a>什么场景可以 “近似只用 Rerank”？</h3><p>只有文档数量非常小，比如几十条以内的小 Demo，才可以把全部文档丢 Rerank；企业级知识库 chunk 达到几万、几十万级别，必须「向量粗召回 + Rerank 精排」组合。</p>
+<h2 id="五、项目踩坑复盘"><a href="#五、项目踩坑复盘" class="headerlink" title="五、项目踩坑复盘"></a>五、项目踩坑复盘</h2><ol>
+<li>❌坑：把上百条候选全部丢入 Rerank，追求不漏文档 ✅后果：GPU 占用飙升，接口 P95 延迟暴涨，QPS 严重上不去。 ✅解决：上游多路召回 + RRF 做粗压缩，控制输入 Rerank 的候选规模。</li>
+<li>❌坑：写死固定 TopK，例如固定取 Top‑8 ✅后果：简单问题带入大量噪声；复杂问题证据不足。 ✅解决：Rerank 输出后采用断崖检测动态截断，配合最低相关性阈值过滤低分。</li>
+<li>❌坑：直接拿 0.5 当做全局通用过滤阈值 ✅后果：不同 Query 场景分数分布差异很大，硬阈值会误杀有效片段或者放过噪声。 ✅解决：基于业务测试集标定经验阈值，优先用断崖相对差值做截断，辅以 0.3 最低安全门槛。</li>
+<li>❌坑：跳过向量检索，想直接全量 Rerank 替代召回 ✅后果：文档量稍微变大，服务完全不可用。 ✅解决：严格遵循「向量粗召回 → RRF 融合 → Rerank 精排」链路。</li>
+<li>❌坑：RRF 输出结果不做任何过滤，直接交给 Rerank，包含大量重复切片 ✅后果：浪费 Rerank 算力，重复文档抢占候选名额。 ✅解决：RRF 阶段做文档 id 去重，再送入 Rerank。</li>
+<li>❌坑：认为 Rerank 可以修复上游召回完全没命中的问题 ✅后果：正确文档根本没有进入候选集，Rerank 再强也无能为力。 ✅解决：Rerank 只能改善已经进入候选池的文档排序；<strong>不能把没有召回出来的文档凭空变出来。</strong></li>
+</ol>
+<h2 id="六、Rerank-使用关键总结"><a href="#六、Rerank-使用关键总结" class="headerlink" title="六、Rerank 使用关键总结"></a>六、Rerank 使用关键总结</h2><ol>
+<li>Rerank 是 Cross‑Encoder 交叉编码器，做 query‑doc 成对联合编码，语义判别精度高，但算力开销大，适合小候选集精排，不适合海量文档遍历。</li>
+<li>分数 0‑1 是 pair 相对分数，不是全局绝对相似度，不能直接拿通用阈值硬套所有业务。</li>
+<li>工程链路：多路向量粗召回 → RRF 融合去重压缩候选 → Rerank 重排 → 断崖动态截断过滤低分。</li>
+<li>候选集大小是召回率和性能的权衡，要结合测试集指标 + 线上延迟综合确定，不要一味追求越大越好。</li>
+<li>Rerank<strong>不能替代向量粗召回</strong>，只能对已经捞出来的候选做重排；正确文档如果上游没有被召回，Rerank 救不回来。</li>
+<li>不要写死固定 TopK；优先采用断崖检测动态截断，兼顾简单、复杂不同查询场景。</li>
+</ol>
+<hr>
+<h2 id="✨博客附加：配套面试真题（全部来源于两份原始文档）"><a href="#✨博客附加：配套面试真题（全部来源于两份原始文档）" class="headerlink" title="✨博客附加：配套面试真题（全部来源于两份原始文档）"></a>✨博客附加：配套面试真题（全部来源于两份原始文档）</h2><blockquote>
+<p>题干来源：<code>02‑尚硅谷AI全能开发技术之企业面试真题V1.0.0.docx</code>、<code>01‑尚硅谷AI全能开发技术之高频面试题‑V1.16.0.docx</code></p>
+</blockquote>
+<h3 id="Q1：Rerank-重排的底层原理是什么？Bi‑Encoder-和-Cross‑Encoder-区别？BGE‑Reranker-打分是什么含义？"><a href="#Q1：Rerank-重排的底层原理是什么？Bi‑Encoder-和-Cross‑Encoder-区别？BGE‑Reranker-打分是什么含义？" class="headerlink" title="Q1：Rerank 重排的底层原理是什么？Bi‑Encoder 和 Cross‑Encoder 区别？BGE‑Reranker 打分是什么含义？"></a>Q1：Rerank 重排的底层原理是什么？Bi‑Encoder 和 Cross‑Encoder 区别？BGE‑Reranker 打分是什么含义？</h3><p><strong>面试回答：</strong> Rerank 属于 Cross‑Encoder 交叉编码器。</p>
+<ul>
+<li>Bi‑Encoder（例如 BGE‑M3 embedding）：Query、文档分开独立编码，生成向量，之后计算相似度。速度很快，适合海量知识库粗召回。</li>
+<li>Cross‑Encoder（Reranker）：把<code>query+doc</code>拼接成对，输入模型做联合编码，同时看到问题和整篇文档，语义相关性判断精度更高；缺点推理算力开销大，速度慢，不适合海量文档遍历。</li>
+</ul>
+<p>BGE‑Reranker‑large 输出分数范围 0~1，分数越高代表这一组 query‑doc 相关性越高。 ⚠️这个分数是<strong>pair 内相对分数，不是全局绝对相似度</strong>。同一个文档搭配不同 query，分数会变化，不能直接拿 0.5 当做所有业务的通用全局阈值。我们项目业务经验，低于 0.3 基本视为无关。</p>
+<h3 id="Q2：你们项目-Rerank-放在链路哪个位置，上游做了什么处理再送入-Rerank？"><a href="#Q2：你们项目-Rerank-放在链路哪个位置，上游做了什么处理再送入-Rerank？" class="headerlink" title="Q2：你们项目 Rerank 放在链路哪个位置，上游做了什么处理再送入 Rerank？"></a>Q2：你们项目 Rerank 放在链路哪个位置，上游做了什么处理再送入 Rerank？</h3><p><strong>面试回答：</strong> 不会直接把原始多路召回结果直接丢 Rerank。 链路顺序：用户 query 改写 → BGE‑M3 稠密稀疏多路并行检索 → RRF 倒数排名融合、做文档去重，压缩候选集合；再合并 MCP 网络检索结果之后送入 Rerank。 上游 RRF 的作用是廉价粗融合、去重，把候选数量降下来，控制送入 Rerank 的文档条数，防止候选太多导致 GPU 压力大、接口延迟飙升。</p>
+<h3 id="Q3：送入-Rerank-的候选集是不是越大越好？候选集大小怎么权衡？"><a href="#Q3：送入-Rerank-的候选集是不是越大越好？候选集大小怎么权衡？" class="headerlink" title="Q3：送入 Rerank 的候选集是不是越大越好？候选集大小怎么权衡？"></a>Q3：送入 Rerank 的候选集是不是越大越好？候选集大小怎么权衡？</h3><p><strong>面试回答：</strong> 不是越大越好。 候选集大：可以提升<code>context_recall</code>，更不容易漏掉潜在相关文档；但是 Rerank 每一条 pair 都要做推理，候选数量上涨，GPU 消耗、接口 P95 延迟会同步上涨，线上 QPS 会被限制。 候选集太小：会出现正确文档在粗召回阶段就被丢弃，Rerank 再强也没有机会处理。</p>
+<p>我们项目 RRF 融合后本地候选最多 20 条，加上 MCP 结果整体给到 Rerank 不超过 25 条。 调参方式：使用离线测试集，观测<code>context_recall</code>和接口 P95 延迟两个指标，找到业务平衡点，不能单方面追求召回率不顾线上性能。</p>
+<h3 id="Q4：Rerank-能不能直接替代向量检索？为什么？"><a href="#Q4：Rerank-能不能直接替代向量检索？为什么？" class="headerlink" title="Q4：Rerank 能不能直接替代向量检索？为什么？"></a>Q4：Rerank 能不能直接替代向量检索？为什么？</h3><p><strong>面试回答：</strong> 企业级生产知识库不能直接替代，只适合几十条以内极小 Demo。 原因两点：</p>
+<ol>
+<li>Rerank 是 Cross‑Encoder，推理开销很高，如果知识库 chunk 几万几十万，全部文档和 query 组成 pair 送入 Rerank，耗时爆炸，完全达不到线上接口性能要求；向量检索 Bi‑Encoder 可以毫秒级完成海量文档粗筛。</li>
+<li>两者分工不同：向量粗召回负责从海量库里面捞出一小批潜在相关候选；Rerank 负责在这一小批候选里面做精细语义甄别。类比初试和复试，不能让全部选手直接进复试。</li>
+</ol>
+<blockquote>
+<p>补充：Rerank 只能对已经进入候选池的文档改变排序；<strong>上游没有召回出来的正确文档，Rerank 无法凭空生成出来。</strong></p>
+</blockquote>
+<h3 id="Q5：Rerank-输出之后，你们为什么不用固定-TopK，而采用断崖检测动态截断？"><a href="#Q5：Rerank-输出之后，你们为什么不用固定-TopK，而采用断崖检测动态截断？" class="headerlink" title="Q5：Rerank 输出之后，你们为什么不用固定 TopK，而采用断崖检测动态截断？"></a>Q5：Rerank 输出之后，你们为什么不用固定 TopK，而采用断崖检测动态截断？</h3><p><strong>面试回答：</strong> 写死固定 TopK 会出现两难：简单问题带入大量噪声，增加幻觉风险；复杂业务查询证据又不够。</p>
+<p>我们项目 Rerank 输出文档按分数降序，采用断崖检测动态截断：最少保留 6 条，最多保留 15 条；当相邻切片分数出现<strong>绝对差 0.5 或者相对差 25%，触发断崖截断，后面全部丢弃</strong>，同时设置 0.3 最低安全阈值，全部低于阈值直接拒答。 简单问题自动少保留切片减少噪声；复杂问题自动保留更多有效证据。</p>
+<h3 id="Q6：Rerank-之后大模型依然忽略中间高分切片，你们怎么处理？"><a href="#Q6：Rerank-之后大模型依然忽略中间高分切片，你们怎么处理？" class="headerlink" title="Q6：Rerank 之后大模型依然忽略中间高分切片，你们怎么处理？"></a>Q6：Rerank 之后大模型依然忽略中间高分切片，你们怎么处理？</h3><blockquote>
+<p>原题出处：02 文档 LinkDoc 面试原题 <strong>面试回答：</strong> 第一，依靠 Rerank 打分，保证高相关性的切片尽量排在列表靠前的位置； 第二，Prompt 显式约束大模型逐条阅读全部参考资料，禁止只看首尾片段； 第三，配合断崖检测，过滤掉大量低分噪声，减少无关内容干扰； 必要场景可以做切片回填，把子块对应的父章节补充进上下文。</p>
+</blockquote>
+<h3 id="Q7：Rerank-有哪些常见线上坑？"><a href="#Q7：Rerank-有哪些常见线上坑？" class="headerlink" title="Q7：Rerank 有哪些常见线上坑？"></a>Q7：Rerank 有哪些常见线上坑？</h3><p><strong>面试回答：</strong></p>
+<ol>
+<li>候选集给的太大：GPU 占用高，P95 延迟暴涨，QPS 上不去；上游一定要 RRF 做候选压缩。</li>
+<li>直接硬编码全局通用分数阈值 0.5：不同 query 分数分布不一样，容易误杀有效片段或者放过噪声，需要基于业务测试集标定阈值。</li>
+<li>误以为 Rerank 可以拯救上游召回失败：正确文档没进入候选池，Rerank 无能为力。</li>
+<li>输入 Rerank 存在大量重复 chunk：浪费算力，RRF 阶段需要做文档 id 去重。</li>
+<li>直接用 Rerank 替换向量检索，知识库文档一多服务性能直接崩盘。</li>
+</ol>
+<h3 id="Q8：RRF-已经完成排序融合了，为什么还需要再做-Rerank？"><a href="#Q8：RRF-已经完成排序融合了，为什么还需要再做-Rerank？" class="headerlink" title="Q8：RRF 已经完成排序融合了，为什么还需要再做 Rerank？"></a>Q8：RRF 已经完成排序融合了，为什么还需要再做 Rerank？</h3><blockquote>
+<p>原题出处：01 文档知识库检索排序章节 <strong>面试回答：</strong> RRF 是基于<strong>文档排名</strong>做的粗融合算法，它并不理解 query 和文档真实语义，只利用各路召回输出的排名做计算，会存在排名靠前但是语义实际不相关的噪声文档。</p>
+</blockquote>
+<p>Rerank 做 query‑doc 交叉编码，真正理解两者语义相关性，是整条检索链路很关键的矫正阀门。哪怕 RRF 排序不理想，Rerank 也可以把真正相关的文档拉高排序，把语义无关的文档打低分压低，为后续动态截断提供可靠分数依据。</p>
+<h3 id="Q9：调参怎么验证-Rerank-相关改动是否生效？"><a href="#Q9：调参怎么验证-Rerank-相关改动是否生效？" class="headerlink" title="Q9：调参怎么验证 Rerank 相关改动是否生效？"></a>Q9：调参怎么验证 Rerank 相关改动是否生效？</h3><blockquote>
+<p>原题出处：01 文档 RAGAS 评测、badcase 分析章节 <strong>面试回答：</strong> 不能拿少数几条 query 主观感受判断。</p>
+</blockquote>
+<ol>
+<li>使用固定离线测试集，调参前后跑同一套数据；重点观测<code>context_recall</code>、<code>context_precision</code>两个指标；</li>
+<li>同时关注接口 P95 延迟、GPU 利用率这类性能指标，不能只看召回效果忽略性能；</li>
+<li>观察 BadCase 集合，原有问题样本是否修复，有没有大批量新增 badcase；</li>
+<li>离线验证通过之后，再做线上小流量灰度采样，线上指标和离线结论对齐，才确认改动生效。</li>
+</ol>
+</article><div class="post-copyright"><div class="copyright-cc-box"><i class="anzhiyufont anzhiyu-icon-copyright"></i></div><div class="post-copyright__author_box"><a class="post-copyright__author_img" href="/" title="头像"><img class="post-copyright__author_img_back" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" title="头像" alt="头像"><img class="post-copyright__author_img_front" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" title="头像" alt="头像"></a><div class="post-copyright__author_name">长星拓</div><div class="post-copyright__author_desc">长星拓的博客</div></div><div class="post-copyright__post__info"><a class="post-copyright__original" title="该文章为原创文章，注意版权协议" href="https://choseitaku.github.io/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/">原创</a><a class="post-copyright-title"><span onclick="rm.copyPageUrl('https://choseitaku.github.io/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/')">Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</span></a></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div class="rewardLeftButton"><div class="post-reward" onclick="anzhiyu.addRewardMask()"><div class="reward-button button--animated" title="赞赏作者"><i class="anzhiyufont anzhiyu-icon-hand-heart-fill"></i>打赏作者</div><div class="reward-main"><div class="reward-all"><span class="reward-title">感谢你赐予我前进的力量</span><ul class="reward-group"><li class="reward-item"><a href="/img/QR/wechat.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/QR/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/QR/alipay.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/QR/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul><a class="reward-main-btn" href="/about/#about-reward" target="_blank"><div class="reward-text">赞赏者名单</div><div class="reward-dec">因为你们的支持让我意识到写文章的价值🙏</div></a></div></div></div><div id="quit-box" onclick="anzhiyu.removeRewardMask()" style="display: none"></div></div><div class="shareRight"><div class="share-link mobile"><div class="share-qrcode"><div class="share-button" title="使用手机访问这篇文章"><i class="anzhiyufont anzhiyu-icon-qrcode"></i></div><div class="share-main"><div class="share-main-all"><div id="qrcode" title="https://choseitaku.github.io/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/"></div><div class="reward-dec">使用手机访问这篇文章</div></div></div></div></div><div class="share-link weibo"><a class="share-button" target="_blank" href="https://service.weibo.com/share/share.php?title=Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？&amp;url=https://choseitaku.github.io/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/&amp;pic=/img/random24.png" rel="external nofollow noreferrer noopener"><i class="anzhiyufont anzhiyu-icon-weibo"></i></a></div><script>function copyCurrentPageUrl() {
+  var currentPageUrl = window.location.href;
+  var input = document.createElement("input");
+  input.setAttribute("value", currentPageUrl);
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  document.body.removeChild(input);
+}</script><div class="share-link copyurl"><div class="share-button" id="post-share-url" title="复制链接" onclick="copyCurrentPageUrl()"><i class="anzhiyufont anzhiyu-icon-link"></i></div></div></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://choseitaku.github.io" target="_blank">长星拓的博客</a>！</span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__box"><div class="post-meta__box__tag-list"><a class="post-meta__box__tags" href="/tags/RAG/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>RAG<span class="tagsPageCount">4</span></a><a class="post-meta__box__tags" href="/tags/Rerank/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>Rerank<span class="tagsPageCount">1</span></a><a class="post-meta__box__tags" href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>向量检索<span class="tagsPageCount">1</span></a></div></div></div><div class="post_share"><div class="social-share" data-image="/img/random24.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"/><script src="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer="defer"></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2026/08/17/3.%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%20BGE%E2%80%91M3%20+%20%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9A%E6%9D%83%E9%87%8D%E8%B0%83%E5%8F%82%E3%80%81%E6%95%88%E6%9E%9C%E8%AF%84%E4%BC%B0%E3%80%81%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E8%B0%83%E5%8F%82%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88/"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random22.png" onerror="onerror=null;src='/img/random11.png'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="anzhiyufont anzhiyu-icon-thumbs-up fa-fw" style="font-size: 1.5rem; margin-right: 4px"></i><span>喜欢这篇文章的人也看了</span></div><div class="relatedPosts-list"><div><a href="/2026/08/14/rag-production-engineering/" title="RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random19.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-08-14</div><div class="title">RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践</div></div></a></div><div><a href="/2026/08/16/2.RAG%20%E5%B9%BB%E8%A7%89%E4%BB%8E%E5%93%AA%E9%87%8C%E6%9D%A5%EF%BC%9F%E5%85%A8%E9%93%BE%E8%B7%AF%E5%AE%9A%E4%BD%8D%E5%B9%BB%E8%A7%89%E6%9D%A5%E6%BA%90%E4%BB%A5%E5%8F%8A%E5%85%A8%E5%A5%97%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random20.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-08-16</div><div class="title">RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案</div></div></a></div><div><a href="/2026/08/17/3.%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%20BGE%E2%80%91M3%20+%20%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9A%E6%9D%83%E9%87%8D%E8%B0%83%E5%8F%82%E3%80%81%E6%95%88%E6%9E%9C%E8%AF%84%E4%BC%B0%E3%80%81%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E8%B0%83%E5%8F%82%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88/" title="混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random22.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-08-17</div><div class="title">混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="author-info__sayhi" id="author-info__sayhi" onclick="anzhiyu.changeSayHelloText()"></div><div class="author-info-avatar"><img class="avatar-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-status"><img class="g-status" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://bu.dusays.com/2023/08/24/64e6ce9c507bb.png" alt="status"/></div></div><div class="author-info__description"><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);"><b style="color:#fff">00 后｜AI 全栈开发者</b></div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">AI 量化・AI 工作流・OPC<br>日语 & 英语双语｜自媒体创作者<br>副业深耕中，奔赴 A8 人生目标</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about"><h1 class="author-info__name">长星拓</h1><div class="author-info__desc">长星拓的博客</div></a><div class="card-info-social-icons is-center"><a class="social-icon faa-parent animated-hover" href="https://github.com/ChoSeitaku" target="_blank" title="Github"><i class="anzhiyufont anzhiyu-icon-github"></i></a><a class="social-icon faa-parent animated-hover" href="https://x.com/choseitaku" target="_blank" title="Twitter"><i class="anzhiyufont anzhiyu-icon-link"></i></a><a class="social-icon faa-parent animated-hover" href="https://blog.csdn.net/CoderZzz6310" target="_blank" title="CSDN"><i class="anzhiyufont anzhiyu-icon-link"></i></a></div></div></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bullhorn anzhiyu-shake"></i><span>公告</span></div><div class="announcement_content">📢 欢迎来到我的博客！这里记录技术思考与生活感悟，希望能为你带来有价值的启发。如有任何问题或想法，欢迎在评论区留言交流～</div></div><div class="card-widget anzhiyu-right-widget" id="card-wechat" onclick="null"><div id="flip-wrapper"><div id="flip-content"><div class="face" style="background: url(https://bu.dusays.com/2023/01/13/63c02edf44033.png) center center / 100% no-repeat"></div><div class="back face" style="background: url(https://bu.dusays.com/2023/05/13/645fa415e8694.png) center center / 100% no-repeat"></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bars"></i><span>文章目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Rerank-%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81Rerank-%E9%87%8D%E6%8E%92%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91"><span class="toc-number">1.2.</span> <span class="toc-text">一、Rerank 重排底层原理与打分逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.1.</span> <span class="toc-text">1. 原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%EF%BC%88BGE%E2%80%91Reranker%E2%80%91large%EF%BC%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. 打分逻辑（BGE‑Reranker‑large）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81Rerank-%E5%9C%A8%E5%AE%8C%E6%95%B4-RAG-%E9%93%BE%E8%B7%AF%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-number">1.3.</span> <span class="toc-text">二、Rerank 在完整 RAG 链路中的位置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E9%93%BE%E8%B7%AF"><span class="toc-number">1.3.1.</span> <span class="toc-text">存储链路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E9%93%BE%E8%B7%AF%E5%AE%8C%E6%95%B4%E7%89%87%E6%AE%B5"><span class="toc-number">1.3.2.</span> <span class="toc-text">查询链路完整片段</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%80%99%E9%80%89%E9%9B%86%E5%A4%A7%E5%B0%8F%E5%A6%82%E4%BD%95%E8%AE%BE%E7%BD%AE%EF%BC%9F%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E6%9D%83%E8%A1%A1"><span class="toc-number">1.4.</span> <span class="toc-text">三、候选集大小如何设置？生产环境权衡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98%E9%85%8D%E7%BD%AE%EF%BC%88StarRag%EF%BC%89"><span class="toc-number">1.4.1.</span> <span class="toc-text">项目实战配置（StarRag）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E6%A0%B8%E5%BF%83%E6%9D%83%E8%A1%A1%E6%80%9D%E8%B7%AF"><span class="toc-number">1.4.2.</span> <span class="toc-text">候选集设置核心权衡思路</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98%EF%BC%9ARerank-%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F"><span class="toc-number">1.5.</span> <span class="toc-text">四、核心问题：Rerank 能不能直接替代向量检索？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E6%8B%86%E8%A7%A3"><span class="toc-number">1.5.1.</span> <span class="toc-text">原因拆解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E5%9C%BA%E6%99%AF%E5%8F%AF%E4%BB%A5-%E2%80%9C%E8%BF%91%E4%BC%BC%E5%8F%AA%E7%94%A8-Rerank%E2%80%9D%EF%BC%9F"><span class="toc-number">1.5.2.</span> <span class="toc-text">什么场景可以 “近似只用 Rerank”？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E9%A1%B9%E7%9B%AE%E8%B8%A9%E5%9D%91%E5%A4%8D%E7%9B%98"><span class="toc-number">1.6.</span> <span class="toc-text">五、项目踩坑复盘</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81Rerank-%E4%BD%BF%E7%94%A8%E5%85%B3%E9%94%AE%E6%80%BB%E7%BB%93"><span class="toc-number">1.7.</span> <span class="toc-text">六、Rerank 使用关键总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%9C%A8%E5%8D%9A%E5%AE%A2%E9%99%84%E5%8A%A0%EF%BC%9A%E9%85%8D%E5%A5%97%E9%9D%A2%E8%AF%95%E7%9C%9F%E9%A2%98%EF%BC%88%E5%85%A8%E9%83%A8%E6%9D%A5%E6%BA%90%E4%BA%8E%E4%B8%A4%E4%BB%BD%E5%8E%9F%E5%A7%8B%E6%96%87%E6%A1%A3%EF%BC%89"><span class="toc-number">1.8.</span> <span class="toc-text">✨博客附加：配套面试真题（全部来源于两份原始文档）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Q1%EF%BC%9ARerank-%E9%87%8D%E6%8E%92%E7%9A%84%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9FBi%E2%80%91Encoder-%E5%92%8C-Cross%E2%80%91Encoder-%E5%8C%BA%E5%88%AB%EF%BC%9FBGE%E2%80%91Reranker-%E6%89%93%E5%88%86%E6%98%AF%E4%BB%80%E4%B9%88%E5%90%AB%E4%B9%89%EF%BC%9F"><span class="toc-number">1.8.1.</span> <span class="toc-text">Q1：Rerank 重排的底层原理是什么？Bi‑Encoder 和 Cross‑Encoder 区别？BGE‑Reranker 打分是什么含义？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q2%EF%BC%9A%E4%BD%A0%E4%BB%AC%E9%A1%B9%E7%9B%AE-Rerank-%E6%94%BE%E5%9C%A8%E9%93%BE%E8%B7%AF%E5%93%AA%E4%B8%AA%E4%BD%8D%E7%BD%AE%EF%BC%8C%E4%B8%8A%E6%B8%B8%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88%E5%A4%84%E7%90%86%E5%86%8D%E9%80%81%E5%85%A5-Rerank%EF%BC%9F"><span class="toc-number">1.8.2.</span> <span class="toc-text">Q2：你们项目 Rerank 放在链路哪个位置，上游做了什么处理再送入 Rerank？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q3%EF%BC%9A%E9%80%81%E5%85%A5-Rerank-%E7%9A%84%E5%80%99%E9%80%89%E9%9B%86%E6%98%AF%E4%B8%8D%E6%98%AF%E8%B6%8A%E5%A4%A7%E8%B6%8A%E5%A5%BD%EF%BC%9F%E5%80%99%E9%80%89%E9%9B%86%E5%A4%A7%E5%B0%8F%E6%80%8E%E4%B9%88%E6%9D%83%E8%A1%A1%EF%BC%9F"><span class="toc-number">1.8.3.</span> <span class="toc-text">Q3：送入 Rerank 的候选集是不是越大越好？候选集大小怎么权衡？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q4%EF%BC%9ARerank-%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.8.4.</span> <span class="toc-text">Q4：Rerank 能不能直接替代向量检索？为什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q5%EF%BC%9ARerank-%E8%BE%93%E5%87%BA%E4%B9%8B%E5%90%8E%EF%BC%8C%E4%BD%A0%E4%BB%AC%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8%E5%9B%BA%E5%AE%9A-TopK%EF%BC%8C%E8%80%8C%E9%87%87%E7%94%A8%E6%96%AD%E5%B4%96%E6%A3%80%E6%B5%8B%E5%8A%A8%E6%80%81%E6%88%AA%E6%96%AD%EF%BC%9F"><span class="toc-number">1.8.5.</span> <span class="toc-text">Q5：Rerank 输出之后，你们为什么不用固定 TopK，而采用断崖检测动态截断？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q6%EF%BC%9ARerank-%E4%B9%8B%E5%90%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BE%9D%E7%84%B6%E5%BF%BD%E7%95%A5%E4%B8%AD%E9%97%B4%E9%AB%98%E5%88%86%E5%88%87%E7%89%87%EF%BC%8C%E4%BD%A0%E4%BB%AC%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%EF%BC%9F"><span class="toc-number">1.8.6.</span> <span class="toc-text">Q6：Rerank 之后大模型依然忽略中间高分切片，你们怎么处理？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q7%EF%BC%9ARerank-%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B8%B8%E8%A7%81%E7%BA%BF%E4%B8%8A%E5%9D%91%EF%BC%9F"><span class="toc-number">1.8.7.</span> <span class="toc-text">Q7：Rerank 有哪些常见线上坑？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q8%EF%BC%9ARRF-%E5%B7%B2%E7%BB%8F%E5%AE%8C%E6%88%90%E6%8E%92%E5%BA%8F%E8%9E%8D%E5%90%88%E4%BA%86%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E9%9C%80%E8%A6%81%E5%86%8D%E5%81%9A-Rerank%EF%BC%9F"><span class="toc-number">1.8.8.</span> <span class="toc-text">Q8：RRF 已经完成排序融合了，为什么还需要再做 Rerank？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Q9%EF%BC%9A%E8%B0%83%E5%8F%82%E6%80%8E%E4%B9%88%E9%AA%8C%E8%AF%81-Rerank-%E7%9B%B8%E5%85%B3%E6%94%B9%E5%8A%A8%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88%EF%BC%9F"><span class="toc-number">1.8.9.</span> <span class="toc-text">Q9：调参怎么验证 Rerank 相关改动是否生效？</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-history"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/" title="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random24.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"/></a><div class="content"><a class="title" href="/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/" title="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？">Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</a><time datetime="2026-08-19T02:00:00.000Z" title="发表于 2026-08-19 10:00:00">2026-08-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/3.%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%20BGE%E2%80%91M3%20+%20%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9A%E6%9D%83%E9%87%8D%E8%B0%83%E5%8F%82%E3%80%81%E6%95%88%E6%9E%9C%E8%AF%84%E4%BC%B0%E3%80%81%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E8%B0%83%E5%8F%82%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88/" title="混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random22.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效"/></a><div class="content"><a class="title" href="/2026/08/17/3.%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%20BGE%E2%80%91M3%20+%20%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9A%E6%9D%83%E9%87%8D%E8%B0%83%E5%8F%82%E3%80%81%E6%95%88%E6%9E%9C%E8%AF%84%E4%BC%B0%E3%80%81%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E8%B0%83%E5%8F%82%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88/" title="混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效">混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效</a><time datetime="2026-08-17T02:00:00.000Z" title="发表于 2026-08-17 10:00:00">2026-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/16/2.RAG%20%E5%B9%BB%E8%A7%89%E4%BB%8E%E5%93%AA%E9%87%8C%E6%9D%A5%EF%BC%9F%E5%85%A8%E9%93%BE%E8%B7%AF%E5%AE%9A%E4%BD%8D%E5%B9%BB%E8%A7%89%E6%9D%A5%E6%BA%90%E4%BB%A5%E5%8F%8A%E5%85%A8%E5%A5%97%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random20.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案"/></a><div class="content"><a class="title" href="/2026/08/16/2.RAG%20%E5%B9%BB%E8%A7%89%E4%BB%8E%E5%93%AA%E9%87%8C%E6%9D%A5%EF%BC%9F%E5%85%A8%E9%93%BE%E8%B7%AF%E5%AE%9A%E4%BD%8D%E5%B9%BB%E8%A7%89%E6%9D%A5%E6%BA%90%E4%BB%A5%E5%8F%8A%E5%85%A8%E5%A5%97%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案">RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案</a><time datetime="2026-08-16T02:00:00.000Z" title="发表于 2026-08-16 10:00:00">2026-08-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/14/rag-production-engineering/" title="RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random19.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践"/></a><div class="content"><a class="title" href="/2026/08/14/rag-production-engineering/" title="RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践">RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践</a><time datetime="2026-08-14T02:00:00.000Z" title="发表于 2026-08-14 10:00:00">2026-08-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/12/starrag/" title="StarRAG - 商品资料知识库问答系统"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random18.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="StarRAG - 商品资料知识库问答系统"/></a><div class="content"><a class="title" href="/2026/08/12/starrag/" title="StarRAG - 商品资料知识库问答系统">StarRAG - 商品资料知识库问答系统</a><time datetime="2026-08-12T02:00:00.000Z" title="发表于 2026-08-12 10:00:00">2026-08-12</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div id="workboard"><img class="workSituationImg boardsign" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-上班摸鱼中.svg" alt="今天也是努力的一天~" title="今天也是努力的一天~"/><div id="runtimeTextTip"></div></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v7.3.0" title="博客框架为Hexo_v7.3.0"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Frame-Hexo.svg" alt="博客框架为Hexo_v7.3.0"/></a><a class="github-badge" target="_blank" href="https://github.com/ChoSeitaku" style="margin-inline:5px" data-title="本站使用安知鱼主题" title="本站使用安知鱼主题"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.9/img/Theme-AnZhiYu-2E67D3.svg" alt="本站使用安知鱼主题"/></a><a class="github-badge" target="_blank" href="https://github.com/ChoSeitaku" style="margin-inline:5px" data-title="本站项目由Github托管" title="本站项目由Github托管"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Source-Github.svg" alt="本站项目由Github托管"/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.2.0/img/badge/Copyright-BY-NC-SA.svg" alt="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"/></a></p></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div id="footer-bar-tips"><div class="copyright">&copy;2026 By <a class="footer-bar-link" href="/" title="长星拓" target="_blank">长星拓</a></div></div><div id="footer-type-tips"></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub">GitHub</a></div></div></div></footer></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="sidebar-site-data site-data is-center"><a href="/archives/" title="archive"><div class="headline">文章</div><div class="length-num">24</div></a><a href="/tags/" title="tag"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/" title="category"><div class="headline">分类</div><div class="length-num">5</div></a></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><a class="darkmode_switchbutton menu-child" href="javascript:void(0);" title="显示模式"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span>显示模式</span></a></div><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://choseitaku.github.io/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="博客"/><span class="back-menu-item-text">博客</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://x.com/choseitaku" title="Twitter"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="Twitter"/><span class="back-menu-item-text">Twitter</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://blog.csdn.net/CoderZzz6310" title="CSDN"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="CSDN"/><span class="back-menu-item-text">CSDN</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub"/><span class="back-menu-item-text">GitHub</span></a></div></div></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 文章</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/archives/"><i class="anzhiyufont anzhiyu-icon-box-archive faa-tada" style="font-size: 0.9em;"></i><span> 全部文章</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/categories/"><i class="anzhiyufont anzhiyu-icon-shapes faa-tada" style="font-size: 0.9em;"></i><span> 分类列表</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags faa-tada" style="font-size: 0.9em;"></i><span> 标签列表</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 我的</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/music/"><i class="anzhiyufont anzhiyu-icon-music faa-tada" style="font-size: 0.9em;"></i><span> 音乐馆</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/bangumis/"><i class="anzhiyufont anzhiyu-icon-bilibili faa-tada" style="font-size: 0.9em;"></i><span> 追番页</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/album/"><i class="anzhiyufont anzhiyu-icon-images faa-tada" style="font-size: 0.9em;"></i><span> 相册集</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/air-conditioner/"><i class="anzhiyufont anzhiyu-icon-fan faa-tada" style="font-size: 0.9em;"></i><span> 小空调</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/room/"><i class="anzhiyufont anzhiyu-icon-house-chimney faa-tada" style="font-size: 0.9em;"></i><span> 小房间</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 关于</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="javascript:toRandomPost()"><i class="anzhiyufont anzhiyu-icon-shoe-prints1 faa-tada" style="font-size: 0.9em;"></i><span> 随便逛逛</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/about/"><i class="anzhiyufont anzhiyu-icon-paper-plane faa-tada" style="font-size: 0.9em;"></i><span> 关于本人</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/AI/" style="font-size: 0.88rem;">AI<sup>11</sup></a><a href="/tags/BGE-M3/" style="font-size: 0.88rem;">BGE-M3<sup>1</sup></a><a href="/tags/Electron/" style="font-size: 0.88rem;">Electron<sup>1</sup></a><a href="/tags/FastAPI/" style="font-size: 0.88rem;">FastAPI<sup>1</sup></a><a href="/tags/Hexo/" style="font-size: 0.88rem;">Hexo<sup>1</sup></a><a href="/tags/Java/" style="font-size: 0.88rem;">Java<sup>1</sup></a><a href="/tags/LangGraph/" style="font-size: 0.88rem;">LangGraph<sup>2</sup></a><a href="/tags/Milvus/" style="font-size: 0.88rem;">Milvus<sup>3</sup></a><a href="/tags/Python/" style="font-size: 0.88rem;">Python<sup>1</sup></a><a href="/tags/RAG/" style="font-size: 0.88rem;">RAG<sup>4</sup></a><a href="/tags/Rerank/" style="font-size: 0.88rem;">Rerank<sup>1</sup></a><a href="/tags/Spring-Cloud/" style="font-size: 0.88rem;">Spring Cloud<sup>1</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 0.88rem;">向量数据库<sup>2</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/" style="font-size: 0.88rem;">向量检索<sup>1</sup></a><a href="/tags/%E5%B9%BB%E8%A7%89/" style="font-size: 0.88rem;">幻觉<sup>1</sup></a><a href="/tags/%E5%BB%BA%E7%AB%99/" style="font-size: 0.88rem;">建站<sup>1</sup></a><a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 0.88rem;">开发工具<sup>1</sup></a><a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 0.88rem;">微服务<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%95%86/" style="font-size: 0.88rem;">电商<sup>1</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 0.88rem;">随笔<sup>2</sup></a><a href="/tags/%E9%9D%A2%E7%BB%8F/" style="font-size: 0.88rem;">面经<sup>9</sup></a><a href="/tags/%E9%A1%B9%E7%9B%AE/" style="font-size: 0.88rem;">项目<sup>6</sup></a></div></div><hr/></div></div><div id="keyboard-tips"><div class="keyboardTitle">博客快捷键</div><div class="keybordList"><div class="keybordItem"><div class="keyGroup"><div class="key">shift K</div></div><div class="keyContent"><div class="content">关闭快捷键功能</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift A</div></div><div class="keyContent"><div class="content">打开/关闭中控台</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift M</div></div><div class="keyContent"><div class="content">播放/暂停音乐</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift D</div></div><div class="keyContent"><div class="content">深色/浅色显示模式</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift S</div></div><div class="keyContent"><div class="content">站内搜索</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift R</div></div><div class="keyContent"><div class="content">随机访问</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift H</div></div><div class="keyContent"><div class="content">返回首页</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift F</div></div><div class="keyContent"><div class="content">友链鱼塘</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift L</div></div><div class="keyContent"><div class="content">友链页面</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift P</div></div><div class="keyContent"><div class="content">关于本站</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift I</div></div><div class="keyContent"><div class="content">原版/本站右键菜单</div></div></div></div></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="anzhiyufont anzhiyu-icon-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="anzhiyufont anzhiyu-icon-gear"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="anzhiyufont anzhiyu-icon-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></button></div></div><div id="nav-music"><a id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()" accesskey="m">播放音乐</a><div id="console-music-bg"></div><meting-js id="17961799618" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random" volume="0.7"></meting-js><script>(function(){
+  var defaultSongId = '3346496288';
+  var checkInterval = setInterval(function(){
+    var aplayerEl = document.querySelector('#nav-music meting-js');
+    if (aplayerEl && aplayerEl.aplayer && aplayerEl.aplayer.list && aplayerEl.aplayer.list.audios.length > 0) {
+      clearInterval(checkInterval);
+      var audios = aplayerEl.aplayer.list.audios;
+      for (var i = 0; i < audios.length; i++) {
+        if (audios[i].id == defaultSongId) {
+          aplayerEl.aplayer.list.switch(i);
+          break;
+        }
+      }
+    }
+  }, 500);
+})();</script></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="anzhiyufont anzhiyu-icon-xmark"></i></button></nav><div class="is-center" id="loading-database"><i class="anzhiyufont anzhiyu-icon-spinner anzhiyu-pulse-icon"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="anzhiyufont anzhiyu-icon-arrow-left"></i></div><div class="rightMenu-item" id="menu-forward"><i class="anzhiyufont anzhiyu-icon-arrow-right"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="anzhiyufont anzhiyu-icon-arrow-rotate-right" style="font-size: 1rem;"></i></div><div class="rightMenu-item" id="menu-top"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="anzhiyufont anzhiyu-icon-paste"></i><span>粘贴文本</span></div><a class="rightMenu-item" id="menu-commenttext"><i class="anzhiyufont anzhiyu-icon-comment-medical"></i><span>引用到评论</span></a><div class="rightMenu-item" id="menu-newwindow"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="anzhiyufont anzhiyu-icon-link"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="anzhiyufont anzhiyu-icon-images"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="anzhiyufont anzhiyu-icon-download"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-newwindowimg"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开图片</span></div><div class="rightMenu-item" id="menu-search"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-searchBaidu"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>百度搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="anzhiyufont anzhiyu-icon-backward"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="anzhiyufont anzhiyu-icon-forward"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-playlist" onclick="window.open(&quot;https://music.163.com/#/playlist?id=17961799618&quot;, &quot;_blank&quot;);" style="display: none;"><i class="anzhiyufont anzhiyu-icon-radio"></i><span>查看所有歌曲</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item menu-link" id="menu-randomPost"><i class="anzhiyufont anzhiyu-icon-shuffle"></i><span>随便逛逛</span></a><a class="rightMenu-item menu-link" href="/categories/"><i class="anzhiyufont anzhiyu-icon-cube"></i><span>博客分类</span></a><a class="rightMenu-item menu-link" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags"></i><span>文章标签</span></a></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item" id="menu-copy" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制地址</span></a><a class="rightMenu-item" id="menu-commentBarrage" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-message"></i><span class="menu-commentBarrage-text">关闭热评</span></a><a class="rightMenu-item" id="menu-darkmode" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span class="menu-darkmode-text">深色模式</span></a><a class="rightMenu-item" id="menu-translate" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-language"></i><span>轉為繁體</span></a></div></div><div id="rightmenu-mask"></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.cbd.int/@fancyapps/ui@6.1.6/dist/fancybox/fancybox.umd.js"></script><script src="https://cdn.cbd.int/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://cdn.cbd.int/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.js"></script><canvas id="universe"></canvas><script async src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/dark/dark.js"></script><script>// 消除控制台打印
+var HoldLog = console.log;
+console.log = function () {};
+let now1 = new Date();
+queueMicrotask(() => {
+  const Log = function () {
+    HoldLog.apply(console, arguments);
+  }; //在恢复前输出日志
+  const grt = new Date("05/12/2026 00:00:00"); //此处修改你的建站时间或者网站上线时间
+  now1.setTime(now1.getTime() + 250);
+  const days = (now1 - grt) / 1000 / 60 / 60 / 24;
+  const dnum = Math.floor(days);
+  const ascll = [
+    `欢迎使用安知鱼!`,
+    `生活明朗, 万物可爱`,
+    `
+        
+       █████╗ ███╗   ██╗███████╗██╗  ██╗██╗██╗   ██╗██╗   ██╗
+      ██╔══██╗████╗  ██║╚══███╔╝██║  ██║██║╚██╗ ██╔╝██║   ██║
+      ███████║██╔██╗ ██║  ███╔╝ ███████║██║ ╚████╔╝ ██║   ██║
+      ██╔══██║██║╚██╗██║ ███╔╝  ██╔══██║██║  ╚██╔╝  ██║   ██║
+      ██║  ██║██║ ╚████║███████╗██║  ██║██║   ██║   ╚██████╔╝
+      ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝    ╚═════╝
+        
+        `,
+    "已上线",
+    dnum,
+    "天",
+    "©2026 By 安知鱼 V1.7.1",
+  ];
+  const ascll2 = [`NCC2-036`, `调用前置摄像头拍照成功，识别为【小笨蛋】.`, `Photo captured: `, `🤪`];
+
+  setTimeout(
+    Log.bind(
+      console,
+      `\n%c${ascll[0]} %c ${ascll[1]} %c ${ascll[2]} %c${ascll[3]}%c ${ascll[4]}%c ${ascll[5]}\n\n%c ${ascll[6]}\n`,
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      ""
+    )
+  );
+  setTimeout(
+    Log.bind(
+      console,
+      `%c ${ascll2[0]} %c ${ascll2[1]} %c \n${ascll2[2]} %c\n${ascll2[3]}\n`,
+      "color:white; background-color:#4fd953",
+      "",
+      "",
+      'background:url("https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/tinggge.gif") no-repeat;font-size:450%'
+    )
+  );
+
+  setTimeout(Log.bind(console, "%c WELCOME %c 你好，小笨蛋.", "color:white; background-color:#4f90d9", ""));
+
+  setTimeout(
+    console.warn.bind(
+      console,
+      "%c ⚡ Powered by 安知鱼 %c 你正在访问 长星拓 的博客.",
+      "color:white; background-color:#f0ad4e",
+      ""
+    )
+  );
+
+  setTimeout(Log.bind(console, "%c W23-12 %c 你已打开控制台.", "color:white; background-color:#4f90d9", ""));
+
+  setTimeout(
+    console.warn.bind(console, "%c S013-782 %c 你现在正处于监控中.", "color:white; background-color:#d9534f", "")
+  );
+});</script><script async src="/anzhiyu/random.js"></script><script async="async">(function () {
+  var grt = new Date("05/12/2026 00:00:00"); //设置网站上线时间
+  var now = new Date();
+  var dnum;
+  var hnum;
+  var mnum;
+  var snum;
+  var nowHour;
+
+  // 计算并更新天数、小时数、分钟数和秒数
+  function updateTime() {
+    now = new Date(); // 更新 now 的值
+    nowHour = now.getHours(); // 更新 nowHour 的值
+    var days = (now - grt) / 1000 / 60 / 60 / 24;
+    dnum = Math.floor(days);
+    var hours = (now - grt) / 1000 / 60 / 60 - 24 * dnum;
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+      hnum = "0" + hnum;
+    }
+    var minutes = (now - grt) / 1000 / 60 - 24 * 60 * dnum - 60 * hnum;
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+      mnum = "0" + mnum;
+    }
+    var seconds = (now - grt) / 1000 - 24 * 60 * 60 * dnum - 60 * 60 * hnum - 60 * mnum;
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+      snum = "0" + snum;
+    }
+  }
+
+  // 更新网页中显示的网站运行时间
+  function updateHtml() {
+    const footer = document.getElementById("footer");
+    if (!footer) return
+    let currentTimeHtml = "";
+    if (nowHour < 18 && nowHour >= 9) {
+      // 如果是上班时间，默认就是"安知鱼-上班摸鱼中.svg"图片，不需要更改
+      currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+    } else {
+      // 如果是下班时间，插入"安知鱼-下班啦.svg"图片
+      let img = document.querySelector("#workboard .workSituationImg");
+      if (img != null) {
+        img.src = "https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-下班啦.svg";
+        img.title = "休息时间，放松一下~";
+        img.alt = "休息时间，放松一下~";
+      }
+
+      currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+    }
+
+    if (document.getElementById("runtimeTextTip")) {
+      document.getElementById("runtimeTextTip").innerHTML = currentTimeHtml;
+    }
+  }
+
+  setInterval(() => {
+    updateTime();
+    updateHtml();
+  }, 1000);
+})();</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><input type="hidden" name="page-type" id="page-type" value="post"></div><script>var visitorMail = "";
+</script><script async data-pjax src="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/waterfall/waterfall.js"></script><script src="https://cdn.cbd.int/qrcodejs@1.0.0/qrcode.min.js"></script><script src="/js/anzhiyu/right_click_menu.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.9/icon/ali_iconfont_css.css"><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/aplayer/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.cbd.int/anzhiyu-blog-static@1.0.1/js/APlayer.min.js"></script><script src="https://cdn.cbd.int/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js"></script><script src="https://cdn.cbd.int/pjax@0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+  // removeEventListener scroll 
+  anzhiyu.removeGlobalFnEvent('pjax')
+  anzhiyu.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script charset="UTF-8" src="https://cdn.cbd.int/anzhiyu-theme-static@1.1.5/accesskey/accesskey.js"></script></div><div id="popup-window"><div class="popup-window-title">通知</div><div class="popup-window-divider"></div><div class="popup-window-content"><div class="popup-tip">你好呀</div><div class="popup-link"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i></div></div></div></body></html>
