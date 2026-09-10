@@ -1,0 +1,696 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战 | 长星拓的博客</title><meta name="keywords" content="FastAPI,LLM,对话系统"><meta name="author" content="长星拓"><meta name="copyright" content="长星拓"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7f9fe"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-touch-fullscreen" content="yes"><meta name="apple-mobile-web-app-title" content="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战"><meta name="application-name" content="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="#f7f9fe"><meta property="og:type" content="article"><meta property="og:title" content="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战"><meta property="og:url" content="https://choseitaku.github.io/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/index.html"><meta property="og:site_name" content="长星拓的博客"><meta property="og:description" content="基于大语言模型的电商智能客服系统，涵盖YAML流程引擎、多轮对话状态持久化、槽位管理等核心设计"><meta property="og:locale" content="zh-CN"><meta property="og:image" content="https://choseitaku.github.io/img/random25.png"><meta property="article:author" content="长星拓"><meta property="article:tag" content="[&quot;博客&quot;,&quot;Hexo&quot;,&quot;安知鱼&quot;]"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://choseitaku.github.io/img/random25.png"><meta name="description" content="基于大语言模型的电商智能客服系统，涵盖YAML流程引擎、多轮对话状态持久化、槽位管理等核心设计"><link rel="shortcut icon" href="/img/siteicon/favicon.png"><link rel="canonical" href="https://choseitaku.github.io/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><link rel="preconnect" href="//cdn.cbd.int"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google-site-verification" content="xxx"/><meta name="baidu-site-verification" content="code-xxx"/><meta name="msvalidate.01" content="xxx"/><link rel="manifest" href="/manifest.json"/><meta name="msapplication-TileColor" content="var(--anzhiyu-main)"/><link rel="mask-icon" href="/img/siteicon/apple-icon-180.png" color="#5bbad5"/><link rel="apple-touch-icon" sizes="180x180" href="/img/siteicon/apple-icon-180.png"/><link rel="apple-touch-icon-precomposed" sizes="180x180" href="/img/siteicon/apple-icon-180.png"/><link rel="icon" type="image/png" sizes="32x32" href="/img/siteicon/32.png"/><link rel="icon" type="image/png" sizes="16x16" href="/img/siteicon/16.png"/><link rel="bookmark" href="/img/siteicon/apple-icon-180.png"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2224-1668.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2160-1620.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1290-2796.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2796-1290.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1179-2556.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2556-1179.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2778-1284.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-2208-1242.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1334-750.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"/><link rel="apple-touch-startup-image" href="/img/siteicon/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/@fancyapps/ui@6.1.6/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  linkPageTop: undefined,
+  peoplecanvas: {"enable":true,"img":"https://upload-bbs.miyoushe.com/upload/2024/07/27/125766904/ba62475f396df9de3316a08ed9e65d86_5680958632268053399..png","imgs":["/img/sprite-sheet.webp"]},
+  postHeadAiDescription: {"enable":true,"gptName":"AnZhiYu","mode":"local","switchBtn":false,"btnLink":"https://afdian.net/item/886a79d4db6711eda42a52540025c377","randomNum":3,"basicWordCount":1000,"key":"xxxx","Referer":"https://xx.xx/"},
+  diytitle: {"enable":true,"leaveTitle":"w(ﾟДﾟ)w 不要走！再看看嘛！","backTitle":"♪(^∇^*)欢迎肥来！"},
+  LA51: {"enable":true,"ck":null,"LingQueMonitorID":null},
+  greetingBox: {"enable":true,"default":"晚上好👋","list":[{"greeting":"晚安😴","startTime":0,"endTime":5},{"greeting":"早上好鸭👋, 祝你一天好心情！","startTime":6,"endTime":9},{"greeting":"上午好👋, 状态很好，鼓励一下～","startTime":10,"endTime":10},{"greeting":"11点多啦, 再坚持一下就吃饭啦～","startTime":11,"endTime":11},{"greeting":"午安👋","startTime":12,"endTime":14},{"greeting":"🌈充实的一天辛苦啦！","startTime":14,"endTime":18},{"greeting":"19点喽, 奖励一顿丰盛的大餐吧🍔","startTime":19,"endTime":19},{"greeting":"晚上好👋, 在属于自己的时间好好放松😌~","startTime":20,"endTime":24}]},
+  twikooEnvId: '',
+  commentBarrageConfig:undefined,
+  music_page_default: "nav_music",
+  root: '/',
+  preloader: {"source":3},
+  friends_vue_info: undefined,
+  navMusic: true,
+  navMusicId: '17961799618',
+  navMusicServer: 'netease',
+  mainTone: undefined,
+  authorStatus: {"skills":["💻 代码爱好者","📝 热爱写作分享","🚀 持续学习中"]},
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简","rightMenuMsgToTraditionalChinese":"转为繁体","rightMenuMsgToSimplifiedChinese":"转为简体"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":330},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    simplehomepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"copy":true,"copyrightEbable":false,"limitCount":50,"languages":{"author":"作者: 长星拓","link":"链接: ","source":"来源: 长星拓的博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。","copySuccess":"复制成功，复制和转载请标注本文地址"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#425AEF","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.cbd.int/flickr-justified-gallery@2.2.0/dist/fjGallery.min.js',
+      css: 'https://cdn.cbd.int/flickr-justified-gallery@2.2.0/dist/fjGallery.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  shortcutKey: {"enable":true,"delay":100,"shiftDelay":200},
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  configTitle: '长星拓的博客',
+  title: 'Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战',
+  postAI: '',
+  pageFillDescription: 'Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战, 项目概览, 功能演示, 技术栈, 系统架构设计, 整体架构, 目录结构, 核心设计：对话引擎, 单轮对话处理流程, 数据结构设计, 会话状态持久化, YAML 流程引擎设计, 流程步骤类型, 步骤间连接, 核心业务流程, 1. 订单状态查询, 2. 退款申请, 3. 物流查询, 所有流程总览, 意图识别与 Prompt 工程, 意图识别, Prompt 模板设计, 回复生成模式, 电商服务设计, 数据模型, API 设计, 前端设计, 关键设计决策与思考, 1. 为什么选择 YAML 配置驱动对话流程？, 2. 三轨道分发设计, 3. 槽位管理与对象消息, 4. 会话状态持久化, 总结电商智能客服系统基于的多轮对话架构设计与实战本文记录了一个基于大语言模型的电商智能客服系统的完整设计与实现过程涵盖对话引擎架构流程配置槽位管理多轮对话状态持久化等核心内容项目概览这是一个完整的电商智能客服示例项目支持订单状态查询物流查询退款申请商品推荐闲聊寒暄等能力并通过流程配置驱动多轮对话功能演示欢迎引导订单状态查询商品咨询退款申请闲聊寒暄技术栈模块技术客服后端电商服务前端系统架构设计整体架构系统采用前后端分离的微服务架构分为三个独立服务前端客服后端电商模拟服务端口端口端口文本消息对象消息订单商品物流退款订单商品列表目录结构智能客服后端核心业务包配置管理应用层领域模型业务服务层对话引擎意图识别任务执行体系知识问答闲聊处理澄清应答模板客户端层持久化层模型对话流程配置服务入口电商模拟服务模型聊天前端组件核心设计对话引擎对话引擎是整个系统的核心负责理解用户意图调度任务执行生成回复单轮对话处理流程用户输入文本对象将转换为从加载调用将修改后的存回准备新建续接过期创建对象分发到文本对象消息处理文本消息路径意图识别调用输出计划校验三路分发轨道流程执行轨道知识问答轨道闲聊数据结构设计对话状态采用分层设计支持多会话多任务并行会话状态持久化对话状态以形式存储在数据库使用实现最后活动时间超过小时自动过期流程引擎设计流程引擎是本项目的亮点设计通过配置定义对话流程实现业务逻辑与代码解耦流程步骤类型步骤类型说明行为流程开始直接推进到下一步收集槽位检查槽位是否已填充未填充则提示用户输入执行动作调用注册的如查订单将返回值写入生成回复三种模式流程结束清除活跃任务步骤间连接固定跳转到指定步骤条件表达式为时跳转条件不满足时的默认跳转核心业务流程订单状态查询请提供您的订单号订单的状态为退款申请请提供需要退款的订单号请说明退款原因已为您提交退款申请订单号原因工作人员将尽快处理物流查询请提供需要查询物流的订单号物流公司运单号当前状态所有流程总览名称步骤链欢迎引导订单状态查询物流查询退款申请相似商品推荐条件判断人工客服转接人工意图识别与工程意图识别系统通过进行意图识别输出结构化的三选一任务轨道流程执行知识问答轨道闲聊轨道模板设计系统使用模板管理支持动态注入上下文你的任务是分析当前对话上下文并生成一个顶层只允许以下三个字段可用允许的对话历史用户最后一句回复生成模式模式说明适用场景模板渲染结构化数据展示模板渲染改写需要自然语言表达纯生成闲聊开放性问题电商服务设计数据模型电商服务包含张核心表用户订单订单明细物流记录物流轨迹退款申请发货提醒商品设计方法路径说明健康检查用户订单列表用户商品列表订单详情订单状态物流信息商品详情创建退款申请前端设计前端采用实现了一个简洁的聊天界面左侧聊天区支持文本消息和对象消息订单商品卡片右侧边栏切换显示用户订单列表和商品列表代理配置代理到客服后端代理到电商服务关键设计决策与思考为什么选择配置驱动对话流程业务与代码解耦产品经理可以直接修改配置无需改动代码可视化流程结构清晰易于理解和维护快速迭代新增业务流程只需添加配置和实现三轨道分发设计将用户意图分为三个轨道各有独立的处理逻辑轨道处理结构化业务流程需要多轮收集信息轨道处理知识问答单轮查询轨道处理闲聊寒暄槽位管理与对象消息支持用户通过点击按钮发送订单商品对象自动填充对应槽位提升交互体验会话状态持久化将对话状态存储在支持多设备接入同一会话会话历史追溯会话过期自动清理总结这个项目展示了如何将与传统业务系统结合构建一个可扩展可维护的智能客服系统核心设计亮点包括流程引擎实现业务逻辑配置化三轨道分发灵活处理不同类型的用户意图槽位管理支持多轮对话信息收集状态持久化保证对话上下文连续性项目代码已开源欢迎交流学习',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2026-09-10 16:55:37',
+  postMainColor: '',
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#18171d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f7f9fe')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body data-type="anzhiyu"><div id="web_bg"></div><div id="an_music_bg"></div><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><img class="loading-img nolazyload" alt="加载头像" src="/img/item/avatar.webp"/><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.getElementById('loading-box').classList.add("loaded");
+  },
+  initLoading: () => {
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+setTimeout(function(){preloader.endLoading();},10000)
+
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.10/progress_bar/progress_bar.css"/><script async="async" src="https://cdn.cbd.int/pace-js@1.2.4/pace.min.js" data-pace-options="{ &quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}"></script><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: url('/img/random25.png') center/contain no-repeat"><nav id="nav"><div id="nav-group"><span id="blog_name"><div class="back-home-button"><i class="anzhiyufont anzhiyu-icon-grip-vertical"></i><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://choseitaku.github.io/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="博客"/><span class="back-menu-item-text">博客</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://x.com/choseitaku" title="Twitter"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="Twitter"/><span class="back-menu-item-text">Twitter</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://blog.csdn.net/CoderZzz6310" title="CSDN"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="CSDN"/><span class="back-menu-item-text">CSDN</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub"/><span class="back-menu-item-text">GitHub</span></a></div></div></div></div><a id="site-name" href="/" accesskey="h"><div class="title">长星拓的博客</div><i class="anzhiyufont anzhiyu-icon-house-chimney"></i></a><div id="he-plugin-simple"></div><script>var WIDGET = {
+  "CONFIG": {
+    "modules": "0124",
+    "background": "2",
+    "tmpColor": "FFFFFF",
+    "tmpSize": "16",
+    "cityColor": "FFFFFF",
+    "citySize": "16",
+    "aqiColor": "E8D87B",
+    "aqiSize": "16",
+    "weatherIconSize": "24",
+    "alertIconSize": "18",
+    "padding": "10px 10px 10px 10px",
+    "shadow": "0",
+    "language": "auto",
+    "borderRadius": "20",
+    "fixed": "true",
+    "vertical": "top",
+    "horizontal": "left",
+    "left": "20",
+    "top": "7.1",
+    "key": "df245676fb434a0691ead1c63341cd94"
+  }
+}
+</script><link rel="stylesheet" href="https://widget.qweather.net/simple/static/css/he-simple.css?v=1.4.0"/><script src="https://widget.qweather.net/simple/static/js/he-simple.js?v=1.4.0"></script></span><div class="mask-name-container"><div id="name-container"><a id="page-name" href="javascript:anzhiyu.scrollToDest(0, 500)">PAGE_NAME</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 文章</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/archives/"><i class="anzhiyufont anzhiyu-icon-box-archive faa-tada" style="font-size: 0.9em;"></i><span> 全部文章</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/categories/"><i class="anzhiyufont anzhiyu-icon-shapes faa-tada" style="font-size: 0.9em;"></i><span> 分类列表</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags faa-tada" style="font-size: 0.9em;"></i><span> 标签列表</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 我的</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/music/"><i class="anzhiyufont anzhiyu-icon-music faa-tada" style="font-size: 0.9em;"></i><span> 音乐馆</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/bangumis/"><i class="anzhiyufont anzhiyu-icon-bilibili faa-tada" style="font-size: 0.9em;"></i><span> 追番页</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/album/"><i class="anzhiyufont anzhiyu-icon-images faa-tada" style="font-size: 0.9em;"></i><span> 相册集</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/air-conditioner/"><i class="anzhiyufont anzhiyu-icon-fan faa-tada" style="font-size: 0.9em;"></i><span> 小空调</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/room/"><i class="anzhiyufont anzhiyu-icon-house-chimney faa-tada" style="font-size: 0.9em;"></i><span> 小房间</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 关于</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="javascript:toRandomPost()"><i class="anzhiyufont anzhiyu-icon-shoe-prints1 faa-tada" style="font-size: 0.9em;"></i><span> 随便逛逛</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/about/"><i class="anzhiyufont anzhiyu-icon-paper-plane faa-tada" style="font-size: 0.9em;"></i><span> 关于本人</span></a></li></ul></div></div></div><div id="nav-right"><div class="nav-button only-home" id="travellings_button" title="随机前往一个开往项目网站"><a class="site-page" onclick="anzhiyu.totraveling()" title="随机前往一个开往项目网站" href="javascript:void(0);" rel="external nofollow" data-pjax-state="external"><i class="anzhiyufont anzhiyu-icon-train"></i></a></div><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机前往一个文章" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-dice"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索🔍" accesskey="s"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span> 搜索</span></a></div><input id="center-console" type="checkbox"/><label class="widget" for="center-console" title="中控台" onclick="anzhiyu.switchConsole();"><i class="left"></i><i class="widget center"></i><i class="widget right"></i></label><div id="console"><div class="console-card-group-reward"><ul class="reward-all console-card"><li class="reward-item"><a href="/img/QR/wechat.jpg" target="_blank"><img class="post-qr-code-img" alt="微信" src="/img/QR/wechat.jpg"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/QR/alipay.jpg" target="_blank"><img class="post-qr-code-img" alt="支付宝" src="/img/QR/alipay.jpg"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div><div class="console-card-group"><div class="console-card-group-left"><div class="console-card" id="card-newest-comments"><div class="card-content"><div class="author-content-item-tips">互动</div><span class="author-content-item-title"> 最新评论</span></div><div class="aside-list"><span>正在加载中...</span></div></div></div><div class="console-card-group-right"><div class="console-card tags"><div class="card-content"><div class="author-content-item-tips">兴趣点</div><span class="author-content-item-title">寻找你感兴趣的领域</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/AI/" style="font-size: 1.05rem;">AI<sup>11</sup></a><a href="/tags/BGE-M3/" style="font-size: 1.05rem;">BGE-M3<sup>1</sup></a><a href="/tags/Electron/" style="font-size: 1.05rem;">Electron<sup>1</sup></a><a href="/tags/FastAPI/" style="font-size: 1.05rem;">FastAPI<sup>2</sup></a><a href="/tags/Hexo/" style="font-size: 1.05rem;">Hexo<sup>1</sup></a><a href="/tags/Java/" style="font-size: 1.05rem;">Java<sup>1</sup></a><a href="/tags/LLM/" style="font-size: 1.05rem;">LLM<sup>1</sup></a><a href="/tags/LangGraph/" style="font-size: 1.05rem;">LangGraph<sup>2</sup></a><a href="/tags/Milvus/" style="font-size: 1.05rem;">Milvus<sup>3</sup></a><a href="/tags/Python/" style="font-size: 1.05rem;">Python<sup>1</sup></a><a href="/tags/RAG/" style="font-size: 1.05rem;">RAG<sup>4</sup></a><a href="/tags/Rerank/" style="font-size: 1.05rem;">Rerank<sup>1</sup></a><a href="/tags/Spring-Cloud/" style="font-size: 1.05rem;">Spring Cloud<sup>1</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 1.05rem;">向量数据库<sup>2</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/" style="font-size: 1.05rem;">向量检索<sup>1</sup></a><a href="/tags/%E5%AF%B9%E8%AF%9D%E7%B3%BB%E7%BB%9F/" style="font-size: 1.05rem;">对话系统<sup>1</sup></a><a href="/tags/%E5%B9%BB%E8%A7%89/" style="font-size: 1.05rem;">幻觉<sup>1</sup></a><a href="/tags/%E5%BB%BA%E7%AB%99/" style="font-size: 1.05rem;">建站<sup>1</sup></a><a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 1.05rem;">开发工具<sup>1</sup></a><a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 1.05rem;">微服务<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%95%86/" style="font-size: 1.05rem;">电商<sup>1</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.05rem;">随笔<sup>2</sup></a><a href="/tags/%E9%9D%A2%E7%BB%8F/" style="font-size: 1.05rem;">面经<sup>9</sup></a><a href="/tags/%E9%A1%B9%E7%9B%AE/" style="font-size: 1.05rem;">项目<sup>6</sup></a></div></div><hr/></div></div><div class="console-card history"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-box-archiv"></i><span>文章</span></div><div class="card-archives"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/08/"><span class="card-archive-list-date">八月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">6</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/07/"><span class="card-archive-list-date">七月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">2</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/06/"><span class="card-archive-list-date">六月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">11</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/05/"><span class="card-archive-list-date">五月 2026</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">6</span><span>篇</span></div></a></li></ul></div><hr/></div></div></div><div class="button-group"><div class="console-btn-item"><a class="darkmode_switchbutton" title="显示模式切换" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-moon"></i></a></div><div class="console-btn-item" id="consoleHideAside" onclick="anzhiyu.hideAsideBtn()" title="边栏显示控制"><a class="asideSwitch"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></a></div><div class="console-btn-item" id="consoleMusic" onclick="anzhiyu.musicToggle()" title="音乐开关"><a class="music-switch"><i class="anzhiyufont anzhiyu-icon-music"></i></a></div><div class="console-btn-item" id="consoleKeyboard" onclick="anzhiyu.keyboardToggle()" title="快捷键开关"><a class="keyboard-switch"><i class="anzhiyufont anzhiyu-icon-keyboard"></i></a></div></div><div class="console-mask" onclick="anzhiyu.hideConsole()" href="javascript:void(0);"></div></div><div class="nav-button" id="nav-totop"><a class="totopbtn" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i><span id="percent" onclick="anzhiyu.scrollToDest(0,500)">0</span></a></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);" title="切换"><i class="anzhiyufont anzhiyu-icon-bars"></i></a></div></div></div></nav><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original">原创</a><span class="post-meta-categories"><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" itemprop="url">项目实战</a></span><span class="article-meta tags"><a class="article-meta__tags" href="/tags/FastAPI/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>FastAPI</span></a><a class="article-meta__tags" href="/tags/LLM/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>LLM</span></a><a class="article-meta__tags" href="/tags/%E5%AF%B9%E8%AF%9D%E7%B3%BB%E7%BB%9F/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>对话系统</span></a></span></div></div><h1 class="post-title" itemprop="name headline">Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="anzhiyufont anzhiyu-icon-calendar-days post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" itemprop="dateCreated datePublished" datetime="2026-08-22T02:00:00.000Z" title="发表于 2026-08-22 10:00:00">2026-08-22</time><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-history post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" itemprop="dateCreated datePublished" datetime="2026-09-10T08:55:37.520Z" title="更新于 2026-09-10 16:55:37">2026-09-10</time></span></div><div class="meta-secondline"><span class="post-meta-separator"></span><span class="post-meta-pv-cv" id="" data-flag-title="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战"><i class="anzhiyufont anzhiyu-icon-fw-eye post-meta-icon"></i><span class="post-meta-label" title="阅读量">阅读量:</span><span id="busuanzi_value_page_pv"><i class="anzhiyufont anzhiyu-icon-spinner anzhiyu-spin"></i></span></span><span class="post-meta-separator">       </span><span class="post-meta-position" title="作者IP属地为深圳"><i class="anzhiyufont anzhiyu-icon-location-dot"></i>深圳</span></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section><div id="post-top-cover"><img class="nolazyload" id="post-top-bg" src="/img/random25.png"></div></header><main id="blog-container"><div class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container" itemscope itemtype="https://choseitaku.github.io/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><header><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" itemprop="url">项目实战</a><a href="/tags/FastAPI/" tabindex="-1" itemprop="url">FastAPI</a><a href="/tags/LLM/" tabindex="-1" itemprop="url">LLM</a><a href="/tags/%E5%AF%B9%E8%AF%9D%E7%B3%BB%E7%BB%9F/" tabindex="-1" itemprop="url">对话系统</a><h1 id="CrawlerTitle" itemprop="name headline">Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战</h1><span itemprop="author" itemscope itemtype="http://schema.org/Person">长星拓</span><time itemprop="dateCreated datePublished" datetime="2026-08-22T02:00:00.000Z" title="发表于 2026-08-22 10:00:00">2026-08-22</time><time itemprop="dateCreated datePublished" datetime="2026-09-10T08:55:37.520Z" title="更新于 2026-09-10 16:55:37">2026-09-10</time></header><h1 id="Star-电商智能客服系统：基于-LLM-的多轮对话架构设计与实战"><a href="#Star-电商智能客服系统：基于-LLM-的多轮对话架构设计与实战" class="headerlink" title="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战"></a>Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战</h1><blockquote>
+<p>本文记录了一个基于大语言模型的电商智能客服系统的完整设计与实现过程，涵盖对话引擎架构、YAML 流程配置、槽位管理、多轮对话状态持久化等核心内容。</p>
+</blockquote>
+<h2 id="项目概览"><a href="#项目概览" class="headerlink" title="项目概览"></a>项目概览</h2><p>这是一个完整的电商智能客服示例项目，支持订单状态查询、物流查询、退款申请、商品推荐、闲聊寒暄等能力，并通过 YAML 流程配置驱动多轮对话。</p>
+<h3 id="功能演示"><a href="#功能演示" class="headerlink" title="功能演示"></a>功能演示</h3><table>
+  <tr>
+    <td align="center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/blog-post/打招呼.jpg" width="300"><br><b>欢迎引导</b></td>
+    <td align="center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/blog-post/查询订单状态.jpg" width="300"><br><b>订单状态查询</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/blog-post/商品咨询.jpg" width="300"><br><b>商品咨询</b></td>
+    <td align="center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/blog-post/退款申请.jpg" width="300"><br><b>退款申请</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/blog-post/闲聊.jpg" width="300"><br><b>闲聊寒暄</b></td>
+  </tr>
+</table>
+
+<h3 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h3><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>技术</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>客服后端</td>
+<td>Python 3.11+、FastAPI、LangChain、SQLAlchemy、aiomysql、Jinja2、PyYAML</td>
+</tr>
+<tr>
+<td>电商服务</td>
+<td>FastAPI、SQLAlchemy、PyMySQL</td>
+</tr>
+<tr>
+<td>前端</td>
+<td>Vue 3、Vite</td>
+</tr>
+</tbody></table>
+<h2 id="系统架构设计"><a href="#系统架构设计" class="headerlink" title="系统架构设计"></a>系统架构设计</h2><h3 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h3><p>系统采用前后端分离的微服务架构，分为三个独立服务：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">┌──────────────────┐     ┌───────────────────┐     ┌──────────────────────────┐</span><br><span class="line">│  Vue 3 前端       │────&gt;│  客服后端           │────&gt;│  电商模拟服务              │</span><br><span class="line">│  (端口 5173)     │&lt;────│  (端口 18082)      │&lt;────│  (端口 18081)            │</span><br><span class="line">│                  │     │  FastAPI           │     │  FastAPI                 │</span><br><span class="line">│  - 文本消息       │     │  + LangChain      │     │  + SQLAlchemy            │</span><br><span class="line">│  - 对象消息       │     │  + YAML Flow      │     │  - 订单/商品/物流/退款     │</span><br><span class="line">│  - 订单/商品列表  │     │  + LLM            │     │  - MySQL (commerce DB)   │</span><br><span class="line">└──────────────────┘     │  - MySQL          │     └──────────────────────────┘</span><br><span class="line">                         │  (customer_service)│</span><br><span class="line">                         └───────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ecommerce-customer-service/</span><br><span class="line">├── customer-service-backend/    # 智能客服后端</span><br><span class="line">│   ├── choseitaku/              # 核心业务包</span><br><span class="line">│   │   ├── conf/                # 配置管理</span><br><span class="line">│   │   ├── app/                 # FastAPI 应用层</span><br><span class="line">│   │   ├── domain/              # 领域模型</span><br><span class="line">│   │   ├── service/             # 业务服务层</span><br><span class="line">│   │   ├── engine/              # 对话引擎</span><br><span class="line">│   │   ├── plan/                # 意图识别</span><br><span class="line">│   │   ├── task/                # 任务执行体系</span><br><span class="line">│   │   ├── knowledge/           # 知识问答</span><br><span class="line">│   │   ├── chitchat/            # 闲聊处理</span><br><span class="line">│   │   ├── clarify/             # 澄清应答</span><br><span class="line">│   │   ├── prompts/             # Prompt 模板</span><br><span class="line">│   │   ├── clients/             # 客户端层</span><br><span class="line">│   │   ├── repository/          # 持久化层</span><br><span class="line">│   │   └── models/              # ORM 模型</span><br><span class="line">│   ├── flow_config/             # 对话流程 YAML 配置</span><br><span class="line">│   └── main.py                  # 服务入口</span><br><span class="line">├── ecommerce-service-backend/   # 电商模拟服务</span><br><span class="line">│   └── app/                     # API + ORM 模型</span><br><span class="line">└── customer-service-frontend/   # 聊天前端</span><br><span class="line">    └── src/                     # Vue 3 组件</span><br></pre></td></tr></table></figure>
+
+<h2 id="核心设计：对话引擎"><a href="#核心设计：对话引擎" class="headerlink" title="核心设计：对话引擎"></a>核心设计：对话引擎</h2><p>对话引擎是整个系统的核心，负责理解用户意图、调度任务执行、生成回复。</p>
+<h3 id="单轮对话处理流程"><a href="#单轮对话处理流程" class="headerlink" title="单轮对话处理流程"></a>单轮对话处理流程</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">用户输入 (文本/对象)</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">[1] chat_router.chat()</span><br><span class="line">    │   将 ChatRequest 转换为 UserMessage</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">[2] DialogueService.process_message()</span><br><span class="line">    │   (a) 从 MySQL 加载 DialogueState</span><br><span class="line">    │   (b) 调用 DialogueEngine</span><br><span class="line">    │   (c) 将修改后的 DialogueState 存回 MySQL</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">[3] DialogueEngine.process_message()</span><br><span class="line">    │   (a) 准备 session（新建/续接/过期）</span><br><span class="line">    │   (b) 创建 Turn 对象</span><br><span class="line">    │   (c) 分发到文本/对象消息处理</span><br><span class="line">    │</span><br><span class="line">    ▼ (文本消息路径)</span><br><span class="line">[4] TurnPlanner.predict() -- 意图识别</span><br><span class="line">    │   调用 LLM -&gt; 输出 TurnPlan JSON</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">[5] TurnPlanValidator.validate() -- 计划校验</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">[6] 三路分发:</span><br><span class="line">    ├─ task 轨道 -&gt; TaskHandler (流程执行)</span><br><span class="line">    ├─ knowledge 轨道 -&gt; KnowledgeHandler (知识问答)</span><br><span class="line">    └─ chitchat 轨道 -&gt; ChitchatHandler (闲聊)</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>对话状态采用分层设计，支持多会话、多任务并行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">DialogueState</span><br><span class="line">├── shared: SharedState</span><br><span class="line">│   ├── focused_object: FocusedObject (type, id, title, attributes)</span><br><span class="line">│   └── sessions: list[Session]</span><br><span class="line">│       └── Session</span><br><span class="line">│           ├── session_id, started_at, last_activity_at</span><br><span class="line">│           └── turns: list[Turn]</span><br><span class="line">│               └── Turn</span><br><span class="line">│                   ├── user_message: UserMessage</span><br><span class="line">│                   └── bot_messages: list[BotMessage]</span><br><span class="line">└── tasks: TaskState</span><br><span class="line">    ├── active: TaskInstance (flow_id, step_id, slots, task_id)</span><br><span class="line">    └── paused: list[TaskInstance]</span><br></pre></td></tr></table></figure>
+
+<h3 id="会话状态持久化"><a href="#会话状态持久化" class="headerlink" title="会话状态持久化"></a>会话状态持久化</h3><ul>
+<li>对话状态以 JSON 形式存储在 MySQL <code>customer_service</code> 数据库</li>
+<li>使用 <code>INSERT ... ON DUPLICATE KEY UPDATE</code> 实现 upsert</li>
+<li>Session 最后活动时间超过 1 小时自动过期</li>
+</ul>
+<h2 id="YAML-流程引擎设计"><a href="#YAML-流程引擎设计" class="headerlink" title="YAML 流程引擎设计"></a>YAML 流程引擎设计</h2><p>流程引擎是本项目的亮点设计，通过 YAML 配置定义对话流程，实现业务逻辑与代码解耦。</p>
+<h3 id="流程步骤类型"><a href="#流程步骤类型" class="headerlink" title="流程步骤类型"></a>流程步骤类型</h3><table>
+<thead>
+<tr>
+<th>步骤类型</th>
+<th>说明</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>start</code></td>
+<td>流程开始</td>
+<td>直接推进到下一步</td>
+</tr>
+<tr>
+<td><code>collect</code></td>
+<td>收集槽位</td>
+<td>检查槽位是否已填充，未填充则提示用户输入</td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td>执行动作</td>
+<td>调用注册的 Action（如查订单），将返回值写入 slots</td>
+</tr>
+<tr>
+<td><code>response</code></td>
+<td>生成回复</td>
+<td>三种模式: static &#x2F; rephrase &#x2F; generate</td>
+</tr>
+<tr>
+<td><code>end</code></td>
+<td>流程结束</td>
+<td>清除活跃任务</td>
+</tr>
+</tbody></table>
+<h3 id="步骤间连接"><a href="#步骤间连接" class="headerlink" title="步骤间连接"></a>步骤间连接</h3><ul>
+<li><strong>StaticLink</strong>: 固定跳转到指定步骤</li>
+<li><strong>ConditionalLink</strong>: 条件表达式为 true 时跳转</li>
+<li><strong>FallbackLink</strong>: 条件不满足时的默认跳转</li>
+</ul>
+<h3 id="核心业务流程"><a href="#核心业务流程" class="headerlink" title="核心业务流程"></a>核心业务流程</h3><h4 id="1-订单状态查询"><a href="#1-订单状态查询" class="headerlink" title="1. 订单状态查询"></a>1. 订单状态查询</h4><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">order_status_query:</span></span><br><span class="line">  <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">start</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">collect_order_number</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">collect_order_number</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">collect</span></span><br><span class="line">      <span class="attr">slot:</span> <span class="string">order_number</span></span><br><span class="line">      <span class="attr">prompt:</span> <span class="string">&quot;请提供您的订单号&quot;</span></span><br><span class="line">      <span class="attr">validation:</span></span><br><span class="line">        <span class="attr">not_empty:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">action_lookup</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">action_lookup</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">action</span></span><br><span class="line">      <span class="attr">action:</span> <span class="string">action_lookup_order_status</span></span><br><span class="line">      <span class="attr">params:</span></span><br><span class="line">        <span class="attr">include_summary:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">response_rephrase</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">response_rephrase</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">response</span></span><br><span class="line">      <span class="attr">mode:</span> <span class="string">rephrase</span></span><br><span class="line">      <span class="attr">template:</span> <span class="string">&quot;订单 <span class="template-variable">&#123;&#123; order_number &#125;&#125;</span> 的状态为：<span class="template-variable">&#123;&#123; order_status &#125;&#125;</span>。<span class="template-variable">&#123;&#123; order_summary &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">end</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">end</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-退款申请"><a href="#2-退款申请" class="headerlink" title="2. 退款申请"></a>2. 退款申请</h4><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">refund_request:</span></span><br><span class="line">  <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">start</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">collect_order_number</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">collect_order_number</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">collect</span></span><br><span class="line">      <span class="attr">slot:</span> <span class="string">order_number</span></span><br><span class="line">      <span class="attr">prompt:</span> <span class="string">&quot;请提供需要退款的订单号&quot;</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">collect_refund_reason</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">collect_refund_reason</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">collect</span></span><br><span class="line">      <span class="attr">slot:</span> <span class="string">refund_reason</span></span><br><span class="line">      <span class="attr">prompt:</span> <span class="string">&quot;请说明退款原因&quot;</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">response_submit</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">response_submit</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">response</span></span><br><span class="line">      <span class="attr">mode:</span> <span class="string">static</span></span><br><span class="line">      <span class="attr">template:</span> <span class="string">&quot;已为您提交退款申请，订单号：<span class="template-variable">&#123;&#123; order_number &#125;&#125;</span>，原因：<span class="template-variable">&#123;&#123; refund_reason &#125;&#125;</span>。工作人员将尽快处理。&quot;</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">end</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">end</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-物流查询"><a href="#3-物流查询" class="headerlink" title="3. 物流查询"></a>3. 物流查询</h4><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">logistics_tracking:</span></span><br><span class="line">  <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">start</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">collect_order_number</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">collect_order_number</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">collect</span></span><br><span class="line">      <span class="attr">slot:</span> <span class="string">order_number</span></span><br><span class="line">      <span class="attr">prompt:</span> <span class="string">&quot;请提供需要查询物流的订单号&quot;</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">action_lookup</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">action_lookup</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">action</span></span><br><span class="line">      <span class="attr">action:</span> <span class="string">action_lookup_logistics</span></span><br><span class="line">      <span class="attr">next:</span> <span class="string">response_static</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">response_static</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">response</span></span><br><span class="line">      <span class="attr">mode:</span> <span class="string">static</span></span><br><span class="line">      <span class="attr">template:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        物流公司：&#123;&#123; logistics_company &#125;&#125;</span></span><br><span class="line"><span class="string">        运单号：&#123;&#123; tracking_number &#125;&#125;</span></span><br><span class="line"><span class="string">        当前状态：&#123;&#123; logistics_status &#125;&#125;</span></span><br><span class="line"><span class="string"></span>      <span class="attr">next:</span> <span class="string">end</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">end</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="所有流程总览"><a href="#所有流程总览" class="headerlink" title="所有流程总览"></a>所有流程总览</h3><table>
+<thead>
+<tr>
+<th>Flow ID</th>
+<th>名称</th>
+<th>步骤链</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>onboarding</code></td>
+<td>欢迎引导</td>
+<td>start -&gt; respond(generate) -&gt; end</td>
+</tr>
+<tr>
+<td><code>order_status_query</code></td>
+<td>订单状态查询</td>
+<td>start -&gt; collect -&gt; action -&gt; response(rephrase) -&gt; end</td>
+</tr>
+<tr>
+<td><code>logistics_tracking</code></td>
+<td>物流查询</td>
+<td>start -&gt; collect -&gt; action -&gt; response(static) -&gt; end</td>
+</tr>
+<tr>
+<td><code>refund_request</code></td>
+<td>退款申请</td>
+<td>start -&gt; collect -&gt; collect -&gt; response(static) -&gt; end</td>
+</tr>
+<tr>
+<td><code>similar_product_recommendation</code></td>
+<td>相似商品推荐</td>
+<td>start -&gt; 条件判断 -&gt; action -&gt; response -&gt; end</td>
+</tr>
+<tr>
+<td><code>human_handoff</code></td>
+<td>人工客服</td>
+<td>start -&gt; respond(“转接人工”) -&gt; end</td>
+</tr>
+</tbody></table>
+<h2 id="意图识别与-Prompt-工程"><a href="#意图识别与-Prompt-工程" class="headerlink" title="意图识别与 Prompt 工程"></a>意图识别与 Prompt 工程</h2><h3 id="意图识别"><a href="#意图识别" class="headerlink" title="意图识别"></a>意图识别</h3><p>系统通过 LLM 进行意图识别，输出结构化的 TurnPlan JSON：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;task&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;commands&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;start_flow&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;flow_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order_status_query&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>TurnPlan 三选一：</p>
+<ul>
+<li><strong>task</strong>: 任务轨道（流程执行）</li>
+<li><strong>knowledge</strong>: 知识问答轨道</li>
+<li><strong>chitchat</strong>: 闲聊轨道</li>
+</ul>
+<h3 id="Prompt-模板设计"><a href="#Prompt-模板设计" class="headerlink" title="Prompt 模板设计"></a>Prompt 模板设计</h3><p>系统使用 Jinja2 模板管理 Prompt，支持动态注入上下文：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">你的任务是分析当前对话上下文，并生成一个 TurnPlan JSON。</span><br><span class="line">TurnPlan 顶层只允许以下三个字段：task / knowledge / chitchat</span><br><span class="line"></span><br><span class="line">可用 flows：&#123;&#123; available_flows_json &#125;&#125;</span><br><span class="line">允许的 intent：&#123;&#123; knowledge_intents_json &#125;&#125;</span><br><span class="line">Active Task：&#123;&#123; active_task_json &#125;&#125;</span><br><span class="line">对话历史：&#123;&#123; current_conversation &#125;&#125;</span><br><span class="line">用户最后一句：&quot;&quot;&quot;&#123;&#123; user_message &#125;&#125;&quot;&quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="回复生成模式"><a href="#回复生成模式" class="headerlink" title="回复生成模式"></a>回复生成模式</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>说明</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>static</code></td>
+<td>Jinja2 模板渲染</td>
+<td>结构化数据展示</td>
+</tr>
+<tr>
+<td><code>rephrase</code></td>
+<td>模板渲染 + LLM 改写</td>
+<td>需要自然语言表达</td>
+</tr>
+<tr>
+<td><code>generate</code></td>
+<td>纯 LLM 生成</td>
+<td>闲聊、开放性问题</td>
+</tr>
+</tbody></table>
+<h2 id="电商服务设计"><a href="#电商服务设计" class="headerlink" title="电商服务设计"></a>电商服务设计</h2><h3 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h3><p>电商服务包含 8 张核心表：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">User (用户)</span><br><span class="line">├── orders -&gt; Order (订单)</span><br><span class="line">│   ├── items -&gt; OrderItem (订单明细)</span><br><span class="line">│   ├── logistics_records -&gt; LogisticsRecord (物流记录)</span><br><span class="line">│   │   └── traces -&gt; LogisticsTrace (物流轨迹)</span><br><span class="line">│   ├── refund_requests -&gt; RefundRequest (退款申请)</span><br><span class="line">│   └── shipping_urges -&gt; ShippingUrgeRequest (发货提醒)</span><br><span class="line">└── products -&gt; Product (商品)</span><br></pre></td></tr></table></figure>
+
+<h3 id="API-设计"><a href="#API-设计" class="headerlink" title="API 设计"></a>API 设计</h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>路径</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/health</code></td>
+<td>健康检查</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/users/&#123;user_id&#125;/orders</code></td>
+<td>用户订单列表</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/users/&#123;user_id&#125;/products</code></td>
+<td>用户商品列表</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/orders/&#123;order_id&#125;</code></td>
+<td>订单详情</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/orders/&#123;order_id&#125;/status</code></td>
+<td>订单状态</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/orders/&#123;order_id&#125;/logistics</code></td>
+<td>物流信息</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/products/&#123;product_id&#125;</code></td>
+<td>商品详情</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/orders/&#123;order_id&#125;/refund-applications</code></td>
+<td>创建退款申请</td>
+</tr>
+</tbody></table>
+<h2 id="前端设计"><a href="#前端设计" class="headerlink" title="前端设计"></a>前端设计</h2><p>前端采用 Vue 3 + Vite，实现了一个简洁的聊天界面：</p>
+<ul>
+<li><strong>左侧聊天区</strong>: 支持文本消息和对象消息（订单&#x2F;商品卡片）</li>
+<li><strong>右侧边栏</strong>: Tab 切换显示用户订单列表和商品列表</li>
+<li><strong>代理配置</strong>: <code>/api</code> 代理到客服后端，<code>/commerce</code> 代理到电商服务</li>
+</ul>
+<h2 id="关键设计决策与思考"><a href="#关键设计决策与思考" class="headerlink" title="关键设计决策与思考"></a>关键设计决策与思考</h2><h3 id="1-为什么选择-YAML-配置驱动对话流程？"><a href="#1-为什么选择-YAML-配置驱动对话流程？" class="headerlink" title="1. 为什么选择 YAML 配置驱动对话流程？"></a>1. 为什么选择 YAML 配置驱动对话流程？</h3><ul>
+<li><strong>业务与代码解耦</strong>: 产品经理可以直接修改 YAML 配置，无需改动代码</li>
+<li><strong>可视化流程</strong>: YAML 结构清晰，易于理解和维护</li>
+<li><strong>快速迭代</strong>: 新增业务流程只需添加 YAML 配置和 Action 实现</li>
+</ul>
+<h3 id="2-三轨道分发设计"><a href="#2-三轨道分发设计" class="headerlink" title="2. 三轨道分发设计"></a>2. 三轨道分发设计</h3><p>将用户意图分为 task &#x2F; knowledge &#x2F; chitchat 三个轨道，各有独立的处理逻辑：</p>
+<ul>
+<li><strong>task 轨道</strong>: 处理结构化业务流程（需要多轮收集信息）</li>
+<li><strong>knowledge 轨道</strong>: 处理知识问答（单轮查询）</li>
+<li><strong>chitchat 轨道</strong>: 处理闲聊寒暄</li>
+</ul>
+<h3 id="3-槽位管理与对象消息"><a href="#3-槽位管理与对象消息" class="headerlink" title="3. 槽位管理与对象消息"></a>3. 槽位管理与对象消息</h3><p>支持用户通过点击按钮发送订单&#x2F;商品对象，自动填充对应槽位，提升交互体验。</p>
+<h3 id="4-会话状态持久化"><a href="#4-会话状态持久化" class="headerlink" title="4. 会话状态持久化"></a>4. 会话状态持久化</h3><p>将对话状态存储在 MySQL，支持：</p>
+<ul>
+<li>多设备接入同一会话</li>
+<li>会话历史追溯</li>
+<li>会话过期自动清理</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个项目展示了如何将 LLM 与传统业务系统结合，构建一个可扩展、可维护的智能客服系统。核心设计亮点包括：</p>
+<ol>
+<li><strong>YAML 流程引擎</strong>: 实现业务逻辑配置化</li>
+<li><strong>三轨道分发</strong>: 灵活处理不同类型的用户意图</li>
+<li><strong>槽位管理</strong>: 支持多轮对话信息收集</li>
+<li><strong>状态持久化</strong>: 保证对话上下文连续性</li>
+</ol>
+<p>项目代码已开源，欢迎交流学习。</p>
+</article><div class="post-copyright"><div class="copyright-cc-box"><i class="anzhiyufont anzhiyu-icon-copyright"></i></div><div class="post-copyright__author_box"><a class="post-copyright__author_img" href="/" title="头像"><img class="post-copyright__author_img_back" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" title="头像" alt="头像"><img class="post-copyright__author_img_front" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" title="头像" alt="头像"></a><div class="post-copyright__author_name">长星拓</div><div class="post-copyright__author_desc">长星拓的博客</div></div><div class="post-copyright__post__info"><a class="post-copyright__original" title="该文章为原创文章，注意版权协议" href="https://choseitaku.github.io/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/">原创</a><a class="post-copyright-title"><span onclick="rm.copyPageUrl('https://choseitaku.github.io/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/')">Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战</span></a></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div class="rewardLeftButton"><div class="post-reward" onclick="anzhiyu.addRewardMask()"><div class="reward-button button--animated" title="赞赏作者"><i class="anzhiyufont anzhiyu-icon-hand-heart-fill"></i>打赏作者</div><div class="reward-main"><div class="reward-all"><span class="reward-title">感谢你赐予我前进的力量</span><ul class="reward-group"><li class="reward-item"><a href="/img/QR/wechat.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/QR/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/QR/alipay.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/QR/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul><a class="reward-main-btn" href="/about/#about-reward" target="_blank"><div class="reward-text">赞赏者名单</div><div class="reward-dec">因为你们的支持让我意识到写文章的价值🙏</div></a></div></div></div><div id="quit-box" onclick="anzhiyu.removeRewardMask()" style="display: none"></div></div><div class="shareRight"><div class="share-link mobile"><div class="share-qrcode"><div class="share-button" title="使用手机访问这篇文章"><i class="anzhiyufont anzhiyu-icon-qrcode"></i></div><div class="share-main"><div class="share-main-all"><div id="qrcode" title="https://choseitaku.github.io/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"></div><div class="reward-dec">使用手机访问这篇文章</div></div></div></div></div><div class="share-link weibo"><a class="share-button" target="_blank" href="https://service.weibo.com/share/share.php?title=Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战&amp;url=https://choseitaku.github.io/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/&amp;pic=/img/random25.png" rel="external nofollow noreferrer noopener"><i class="anzhiyufont anzhiyu-icon-weibo"></i></a></div><script>function copyCurrentPageUrl() {
+  var currentPageUrl = window.location.href;
+  var input = document.createElement("input");
+  input.setAttribute("value", currentPageUrl);
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  document.body.removeChild(input);
+}</script><div class="share-link copyurl"><div class="share-button" id="post-share-url" title="复制链接" onclick="copyCurrentPageUrl()"><i class="anzhiyufont anzhiyu-icon-link"></i></div></div></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://choseitaku.github.io" target="_blank">长星拓的博客</a>！</span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__box"><div class="post-meta__box__tag-list"><a class="post-meta__box__tags" href="/tags/FastAPI/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>FastAPI<span class="tagsPageCount">2</span></a><a class="post-meta__box__tags" href="/tags/LLM/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>LLM<span class="tagsPageCount">1</span></a><a class="post-meta__box__tags" href="/tags/%E5%AF%B9%E8%AF%9D%E7%B3%BB%E7%BB%9F/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>对话系统<span class="tagsPageCount">1</span></a></div></div></div><div class="post_share"><div class="social-share" data-image="/img/random25.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"/><script src="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer="defer"></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random24.png" onerror="onerror=null;src='/img/random11.png'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="anzhiyufont anzhiyu-icon-thumbs-up fa-fw" style="font-size: 1.5rem; margin-right: 4px"></i><span>喜欢这篇文章的人也看了</span></div><div class="relatedPosts-list"><div><a href="/2026/07/03/install-helper/" title="从零构建「装了吗」—— 一个 AI 驱动的开发者工具安装助手"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random10.png" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2026-07-03</div><div class="title">从零构建「装了吗」—— 一个 AI 驱动的开发者工具安装助手</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="author-info__sayhi" id="author-info__sayhi" onclick="anzhiyu.changeSayHelloText()"></div><div class="author-info-avatar"><img class="avatar-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/item/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-status"><img class="g-status" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://bu.dusays.com/2023/08/24/64e6ce9c507bb.png" alt="status"/></div></div><div class="author-info__description"><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);"><b style="color:#fff">00 后｜AI 全栈开发者</b></div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">AI 量化・AI 工作流・OPC<br>日语 & 英语双语｜自媒体创作者<br>副业深耕中，奔赴 A8 人生目标</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about"><h1 class="author-info__name">长星拓</h1><div class="author-info__desc">长星拓的博客</div></a><div class="card-info-social-icons is-center"><a class="social-icon faa-parent animated-hover" href="https://github.com/ChoSeitaku" target="_blank" title="Github"><i class="anzhiyufont anzhiyu-icon-github"></i></a><a class="social-icon faa-parent animated-hover" href="https://x.com/choseitaku" target="_blank" title="Twitter"><i class="anzhiyufont anzhiyu-icon-link"></i></a><a class="social-icon faa-parent animated-hover" href="https://blog.csdn.net/CoderZzz6310" target="_blank" title="CSDN"><i class="anzhiyufont anzhiyu-icon-link"></i></a></div></div></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bullhorn anzhiyu-shake"></i><span>公告</span></div><div class="announcement_content">📢 欢迎来到我的博客！这里记录技术思考与生活感悟，希望能为你带来有价值的启发。如有任何问题或想法，欢迎在评论区留言交流～</div></div><div class="card-widget anzhiyu-right-widget" id="card-wechat" onclick="null"><div id="flip-wrapper"><div id="flip-content"><div class="face" style="background: url(https://bu.dusays.com/2023/01/13/63c02edf44033.png) center center / 100% no-repeat"></div><div class="back face" style="background: url(https://bu.dusays.com/2023/05/13/645fa415e8694.png) center center / 100% no-repeat"></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bars"></i><span>文章目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Star-%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%EF%BC%9A%E5%9F%BA%E4%BA%8E-LLM-%E7%9A%84%E5%A4%9A%E8%BD%AE%E5%AF%B9%E8%AF%9D%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E6%88%98"><span class="toc-number">1.</span> <span class="toc-text">Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%A7%88"><span class="toc-number">1.1.</span> <span class="toc-text">项目概览</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA"><span class="toc-number">1.1.1.</span> <span class="toc-text">功能演示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E6%A0%88"><span class="toc-number">1.1.2.</span> <span class="toc-text">技术栈</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.2.</span> <span class="toc-text">系统架构设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-number">1.2.1.</span> <span class="toc-text">整体架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.2.</span> <span class="toc-text">目录结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E8%AE%BE%E8%AE%A1%EF%BC%9A%E5%AF%B9%E8%AF%9D%E5%BC%95%E6%93%8E"><span class="toc-number">1.3.</span> <span class="toc-text">核心设计：对话引擎</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E8%BD%AE%E5%AF%B9%E8%AF%9D%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.1.</span> <span class="toc-text">单轮对话处理流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.3.2.</span> <span class="toc-text">数据结构设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%9A%E8%AF%9D%E7%8A%B6%E6%80%81%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-number">1.3.3.</span> <span class="toc-text">会话状态持久化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#YAML-%E6%B5%81%E7%A8%8B%E5%BC%95%E6%93%8E%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.4.</span> <span class="toc-text">YAML 流程引擎设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E6%AD%A5%E9%AA%A4%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.4.1.</span> <span class="toc-text">流程步骤类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4%E9%97%B4%E8%BF%9E%E6%8E%A5"><span class="toc-number">1.4.2.</span> <span class="toc-text">步骤间连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E4%B8%9A%E5%8A%A1%E6%B5%81%E7%A8%8B"><span class="toc-number">1.4.3.</span> <span class="toc-text">核心业务流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E8%AE%A2%E5%8D%95%E7%8A%B6%E6%80%81%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.4.3.1.</span> <span class="toc-text">1. 订单状态查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E9%80%80%E6%AC%BE%E7%94%B3%E8%AF%B7"><span class="toc-number">1.4.3.2.</span> <span class="toc-text">2. 退款申请</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E7%89%A9%E6%B5%81%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.4.3.3.</span> <span class="toc-text">3. 物流查询</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E6%9C%89%E6%B5%81%E7%A8%8B%E6%80%BB%E8%A7%88"><span class="toc-number">1.4.4.</span> <span class="toc-text">所有流程总览</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%84%8F%E5%9B%BE%E8%AF%86%E5%88%AB%E4%B8%8E-Prompt-%E5%B7%A5%E7%A8%8B"><span class="toc-number">1.5.</span> <span class="toc-text">意图识别与 Prompt 工程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%84%8F%E5%9B%BE%E8%AF%86%E5%88%AB"><span class="toc-number">1.5.1.</span> <span class="toc-text">意图识别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prompt-%E6%A8%A1%E6%9D%BF%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.5.2.</span> <span class="toc-text">Prompt 模板设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9E%E5%A4%8D%E7%94%9F%E6%88%90%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.5.3.</span> <span class="toc-text">回复生成模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%B5%E5%95%86%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.6.</span> <span class="toc-text">电商服务设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.6.1.</span> <span class="toc-text">数据模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#API-%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.6.2.</span> <span class="toc-text">API 设计</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.7.</span> <span class="toc-text">前端设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%AE%BE%E8%AE%A1%E5%86%B3%E7%AD%96%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">1.8.</span> <span class="toc-text">关键设计决策与思考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9-YAML-%E9%85%8D%E7%BD%AE%E9%A9%B1%E5%8A%A8%E5%AF%B9%E8%AF%9D%E6%B5%81%E7%A8%8B%EF%BC%9F"><span class="toc-number">1.8.1.</span> <span class="toc-text">1. 为什么选择 YAML 配置驱动对话流程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%B8%89%E8%BD%A8%E9%81%93%E5%88%86%E5%8F%91%E8%AE%BE%E8%AE%A1"><span class="toc-number">1.8.2.</span> <span class="toc-text">2. 三轨道分发设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%A7%BD%E4%BD%8D%E7%AE%A1%E7%90%86%E4%B8%8E%E5%AF%B9%E8%B1%A1%E6%B6%88%E6%81%AF"><span class="toc-number">1.8.3.</span> <span class="toc-text">3. 槽位管理与对象消息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BC%9A%E8%AF%9D%E7%8A%B6%E6%80%81%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-number">1.8.4.</span> <span class="toc-text">4. 会话状态持久化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.9.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-history"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" title="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random25.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战"/></a><div class="content"><a class="title" href="/2026/08/22/Star%E7%94%B5%E5%95%86%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E7%B3%BB%E7%BB%9F%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" title="Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战">Star 电商智能客服系统：基于 LLM 的多轮对话架构设计与实战</a><time datetime="2026-08-22T02:00:00.000Z" title="发表于 2026-08-22 10:00:00">2026-08-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/" title="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random24.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？"/></a><div class="content"><a class="title" href="/2026/08/19/4.Rerank%20%E9%87%8D%E6%8E%92%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E7%A8%8B%E8%90%BD%E5%9C%B0%EF%BC%9A%E5%80%99%E9%80%89%E9%9B%86%E8%AE%BE%E7%BD%AE%E3%80%81%E6%89%93%E5%88%86%E9%80%BB%E8%BE%91%E3%80%81%E8%83%BD%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E6%9B%BF%E4%BB%A3%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9F/" title="Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？">Rerank 重排原理与工程落地：候选集设置、打分逻辑、能不能直接替代向量检索？</a><time datetime="2026-08-19T02:00:00.000Z" title="发表于 2026-08-19 10:00:00">2026-08-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/17/3.%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%20BGE%E2%80%91M3%20+%20%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9A%E6%9D%83%E9%87%8D%E8%B0%83%E5%8F%82%E3%80%81%E6%95%88%E6%9E%9C%E8%AF%84%E4%BC%B0%E3%80%81%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E8%B0%83%E5%8F%82%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88/" title="混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random22.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效"/></a><div class="content"><a class="title" href="/2026/08/17/3.%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%20BGE%E2%80%91M3%20+%20%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%EF%BC%9A%E6%9D%83%E9%87%8D%E8%B0%83%E5%8F%82%E3%80%81%E6%95%88%E6%9E%9C%E8%AF%84%E4%BC%B0%E3%80%81%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E8%B0%83%E5%8F%82%E6%98%AF%E5%90%A6%E7%94%9F%E6%95%88/" title="混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效">混合检索 BGE-M3 + 向量检索：权重调参、效果评估、如何判断调参是否生效</a><time datetime="2026-08-17T02:00:00.000Z" title="发表于 2026-08-17 10:00:00">2026-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/16/2.RAG%20%E5%B9%BB%E8%A7%89%E4%BB%8E%E5%93%AA%E9%87%8C%E6%9D%A5%EF%BC%9F%E5%85%A8%E9%93%BE%E8%B7%AF%E5%AE%9A%E4%BD%8D%E5%B9%BB%E8%A7%89%E6%9D%A5%E6%BA%90%E4%BB%A5%E5%8F%8A%E5%85%A8%E5%A5%97%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random20.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案"/></a><div class="content"><a class="title" href="/2026/08/16/2.RAG%20%E5%B9%BB%E8%A7%89%E4%BB%8E%E5%93%AA%E9%87%8C%E6%9D%A5%EF%BC%9F%E5%85%A8%E9%93%BE%E8%B7%AF%E5%AE%9A%E4%BD%8D%E5%B9%BB%E8%A7%89%E6%9D%A5%E6%BA%90%E4%BB%A5%E5%8F%8A%E5%85%A8%E5%A5%97%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案">RAG 幻觉从哪里来？全链路定位幻觉来源以及全套解决方案</a><time datetime="2026-08-16T02:00:00.000Z" title="发表于 2026-08-16 10:00:00">2026-08-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/14/rag-production-engineering/" title="RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/random19.png" onerror="this.onerror=null;this.src='/img/random11.png'" alt="RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践"/></a><div class="content"><a class="title" href="/2026/08/14/rag-production-engineering/" title="RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践">RAG 全链路拆解：从文档解析到向量召回再到重排完整工程实践</a><time datetime="2026-08-14T02:00:00.000Z" title="发表于 2026-08-14 10:00:00">2026-08-14</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div id="workboard"><img class="workSituationImg boardsign" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-上班摸鱼中.svg" alt="今天也是努力的一天~" title="今天也是努力的一天~"/><div id="runtimeTextTip"></div></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v7.3.0" title="博客框架为Hexo_v7.3.0"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Frame-Hexo.svg" alt="博客框架为Hexo_v7.3.0"/></a><a class="github-badge" target="_blank" href="https://github.com/ChoSeitaku" style="margin-inline:5px" data-title="本站使用安知鱼主题" title="本站使用安知鱼主题"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.9/img/Theme-AnZhiYu-2E67D3.svg" alt="本站使用安知鱼主题"/></a><a class="github-badge" target="_blank" href="https://github.com/ChoSeitaku" style="margin-inline:5px" data-title="本站项目由Github托管" title="本站项目由Github托管"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Source-Github.svg" alt="本站项目由Github托管"/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://npm.elemecdn.com/anzhiyu-blog@2.2.0/img/badge/Copyright-BY-NC-SA.svg" alt="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"/></a></p></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div id="footer-bar-tips"><div class="copyright">&copy;2026 By <a class="footer-bar-link" href="/" title="长星拓" target="_blank">长星拓</a></div></div><div id="footer-type-tips"></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub">GitHub</a></div></div></div></footer></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="sidebar-site-data site-data is-center"><a href="/archives/" title="archive"><div class="headline">文章</div><div class="length-num">25</div></a><a href="/tags/" title="tag"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/" title="category"><div class="headline">分类</div><div class="length-num">6</div></a></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><a class="darkmode_switchbutton menu-child" href="javascript:void(0);" title="显示模式"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span>显示模式</span></a></div><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://choseitaku.github.io/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="博客"/><span class="back-menu-item-text">博客</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://x.com/choseitaku" title="Twitter"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="Twitter"/><span class="back-menu-item-text">Twitter</span></a><a class="back-menu-item" target="_blank" rel="noopener" href="https://blog.csdn.net/CoderZzz6310" title="CSDN"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="/img/siteicon/favicon.png" alt="CSDN"/><span class="back-menu-item-text">CSDN</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" target="_blank" rel="noopener" href="https://github.com/ChoSeitaku" title="GitHub"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/random11.png&quot;" data-lazy-src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub"/><span class="back-menu-item-text">GitHub</span></a></div></div></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 文章</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/archives/"><i class="anzhiyufont anzhiyu-icon-box-archive faa-tada" style="font-size: 0.9em;"></i><span> 全部文章</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/categories/"><i class="anzhiyufont anzhiyu-icon-shapes faa-tada" style="font-size: 0.9em;"></i><span> 分类列表</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags faa-tada" style="font-size: 0.9em;"></i><span> 标签列表</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 我的</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/music/"><i class="anzhiyufont anzhiyu-icon-music faa-tada" style="font-size: 0.9em;"></i><span> 音乐馆</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/bangumis/"><i class="anzhiyufont anzhiyu-icon-bilibili faa-tada" style="font-size: 0.9em;"></i><span> 追番页</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/album/"><i class="anzhiyufont anzhiyu-icon-images faa-tada" style="font-size: 0.9em;"></i><span> 相册集</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/air-conditioner/"><i class="anzhiyufont anzhiyu-icon-fan faa-tada" style="font-size: 0.9em;"></i><span> 小空调</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/room/"><i class="anzhiyufont anzhiyu-icon-house-chimney faa-tada" style="font-size: 0.9em;"></i><span> 小房间</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span> 关于</span></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="javascript:toRandomPost()"><i class="anzhiyufont anzhiyu-icon-shoe-prints1 faa-tada" style="font-size: 0.9em;"></i><span> 随便逛逛</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/about/"><i class="anzhiyufont anzhiyu-icon-paper-plane faa-tada" style="font-size: 0.9em;"></i><span> 关于本人</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/AI/" style="font-size: 0.88rem;">AI<sup>11</sup></a><a href="/tags/BGE-M3/" style="font-size: 0.88rem;">BGE-M3<sup>1</sup></a><a href="/tags/Electron/" style="font-size: 0.88rem;">Electron<sup>1</sup></a><a href="/tags/FastAPI/" style="font-size: 0.88rem;">FastAPI<sup>2</sup></a><a href="/tags/Hexo/" style="font-size: 0.88rem;">Hexo<sup>1</sup></a><a href="/tags/Java/" style="font-size: 0.88rem;">Java<sup>1</sup></a><a href="/tags/LLM/" style="font-size: 0.88rem;">LLM<sup>1</sup></a><a href="/tags/LangGraph/" style="font-size: 0.88rem;">LangGraph<sup>2</sup></a><a href="/tags/Milvus/" style="font-size: 0.88rem;">Milvus<sup>3</sup></a><a href="/tags/Python/" style="font-size: 0.88rem;">Python<sup>1</sup></a><a href="/tags/RAG/" style="font-size: 0.88rem;">RAG<sup>4</sup></a><a href="/tags/Rerank/" style="font-size: 0.88rem;">Rerank<sup>1</sup></a><a href="/tags/Spring-Cloud/" style="font-size: 0.88rem;">Spring Cloud<sup>1</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 0.88rem;">向量数据库<sup>2</sup></a><a href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/" style="font-size: 0.88rem;">向量检索<sup>1</sup></a><a href="/tags/%E5%AF%B9%E8%AF%9D%E7%B3%BB%E7%BB%9F/" style="font-size: 0.88rem;">对话系统<sup>1</sup></a><a href="/tags/%E5%B9%BB%E8%A7%89/" style="font-size: 0.88rem;">幻觉<sup>1</sup></a><a href="/tags/%E5%BB%BA%E7%AB%99/" style="font-size: 0.88rem;">建站<sup>1</sup></a><a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 0.88rem;">开发工具<sup>1</sup></a><a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 0.88rem;">微服务<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%95%86/" style="font-size: 0.88rem;">电商<sup>1</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 0.88rem;">随笔<sup>2</sup></a><a href="/tags/%E9%9D%A2%E7%BB%8F/" style="font-size: 0.88rem;">面经<sup>9</sup></a><a href="/tags/%E9%A1%B9%E7%9B%AE/" style="font-size: 0.88rem;">项目<sup>6</sup></a></div></div><hr/></div></div><div id="keyboard-tips"><div class="keyboardTitle">博客快捷键</div><div class="keybordList"><div class="keybordItem"><div class="keyGroup"><div class="key">shift K</div></div><div class="keyContent"><div class="content">关闭快捷键功能</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift A</div></div><div class="keyContent"><div class="content">打开/关闭中控台</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift M</div></div><div class="keyContent"><div class="content">播放/暂停音乐</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift D</div></div><div class="keyContent"><div class="content">深色/浅色显示模式</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift S</div></div><div class="keyContent"><div class="content">站内搜索</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift R</div></div><div class="keyContent"><div class="content">随机访问</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift H</div></div><div class="keyContent"><div class="content">返回首页</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift F</div></div><div class="keyContent"><div class="content">友链鱼塘</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift L</div></div><div class="keyContent"><div class="content">友链页面</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift P</div></div><div class="keyContent"><div class="content">关于本站</div></div></div><div class="keybordItem"><div class="keyGroup"><div class="key">shift I</div></div><div class="keyContent"><div class="content">原版/本站右键菜单</div></div></div></div></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="anzhiyufont anzhiyu-icon-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="anzhiyufont anzhiyu-icon-gear"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="anzhiyufont anzhiyu-icon-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></button></div></div><div id="nav-music"><a id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()" accesskey="m">播放音乐</a><div id="console-music-bg"></div><meting-js id="17961799618" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random" volume="0.7"></meting-js><script>(function(){
+  var defaultSongId = '3346496288';
+  var checkInterval = setInterval(function(){
+    var aplayerEl = document.querySelector('#nav-music meting-js');
+    if (aplayerEl && aplayerEl.aplayer && aplayerEl.aplayer.list && aplayerEl.aplayer.list.audios.length > 0) {
+      clearInterval(checkInterval);
+      var audios = aplayerEl.aplayer.list.audios;
+      for (var i = 0; i < audios.length; i++) {
+        if (audios[i].id == defaultSongId) {
+          aplayerEl.aplayer.list.switch(i);
+          break;
+        }
+      }
+    }
+  }, 500);
+})();</script></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="anzhiyufont anzhiyu-icon-xmark"></i></button></nav><div class="is-center" id="loading-database"><i class="anzhiyufont anzhiyu-icon-spinner anzhiyu-pulse-icon"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="anzhiyufont anzhiyu-icon-arrow-left"></i></div><div class="rightMenu-item" id="menu-forward"><i class="anzhiyufont anzhiyu-icon-arrow-right"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="anzhiyufont anzhiyu-icon-arrow-rotate-right" style="font-size: 1rem;"></i></div><div class="rightMenu-item" id="menu-top"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="anzhiyufont anzhiyu-icon-paste"></i><span>粘贴文本</span></div><a class="rightMenu-item" id="menu-commenttext"><i class="anzhiyufont anzhiyu-icon-comment-medical"></i><span>引用到评论</span></a><div class="rightMenu-item" id="menu-newwindow"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="anzhiyufont anzhiyu-icon-link"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="anzhiyufont anzhiyu-icon-images"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="anzhiyufont anzhiyu-icon-download"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-newwindowimg"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开图片</span></div><div class="rightMenu-item" id="menu-search"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-searchBaidu"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>百度搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="anzhiyufont anzhiyu-icon-backward"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="anzhiyufont anzhiyu-icon-forward"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-playlist" onclick="window.open(&quot;https://music.163.com/#/playlist?id=17961799618&quot;, &quot;_blank&quot;);" style="display: none;"><i class="anzhiyufont anzhiyu-icon-radio"></i><span>查看所有歌曲</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item menu-link" id="menu-randomPost"><i class="anzhiyufont anzhiyu-icon-shuffle"></i><span>随便逛逛</span></a><a class="rightMenu-item menu-link" href="/categories/"><i class="anzhiyufont anzhiyu-icon-cube"></i><span>博客分类</span></a><a class="rightMenu-item menu-link" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags"></i><span>文章标签</span></a></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item" id="menu-copy" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制地址</span></a><a class="rightMenu-item" id="menu-commentBarrage" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-message"></i><span class="menu-commentBarrage-text">关闭热评</span></a><a class="rightMenu-item" id="menu-darkmode" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span class="menu-darkmode-text">深色模式</span></a><a class="rightMenu-item" id="menu-translate" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-language"></i><span>轉為繁體</span></a></div></div><div id="rightmenu-mask"></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.cbd.int/@fancyapps/ui@6.1.6/dist/fancybox/fancybox.umd.js"></script><script src="https://cdn.cbd.int/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://cdn.cbd.int/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.js"></script><canvas id="universe"></canvas><script async src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/dark/dark.js"></script><script>// 消除控制台打印
+var HoldLog = console.log;
+console.log = function () {};
+let now1 = new Date();
+queueMicrotask(() => {
+  const Log = function () {
+    HoldLog.apply(console, arguments);
+  }; //在恢复前输出日志
+  const grt = new Date("05/12/2026 00:00:00"); //此处修改你的建站时间或者网站上线时间
+  now1.setTime(now1.getTime() + 250);
+  const days = (now1 - grt) / 1000 / 60 / 60 / 24;
+  const dnum = Math.floor(days);
+  const ascll = [
+    `欢迎使用安知鱼!`,
+    `生活明朗, 万物可爱`,
+    `
+        
+       █████╗ ███╗   ██╗███████╗██╗  ██╗██╗██╗   ██╗██╗   ██╗
+      ██╔══██╗████╗  ██║╚══███╔╝██║  ██║██║╚██╗ ██╔╝██║   ██║
+      ███████║██╔██╗ ██║  ███╔╝ ███████║██║ ╚████╔╝ ██║   ██║
+      ██╔══██║██║╚██╗██║ ███╔╝  ██╔══██║██║  ╚██╔╝  ██║   ██║
+      ██║  ██║██║ ╚████║███████╗██║  ██║██║   ██║   ╚██████╔╝
+      ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝    ╚═════╝
+        
+        `,
+    "已上线",
+    dnum,
+    "天",
+    "©2026 By 安知鱼 V1.7.1",
+  ];
+  const ascll2 = [`NCC2-036`, `调用前置摄像头拍照成功，识别为【小笨蛋】.`, `Photo captured: `, `🤪`];
+
+  setTimeout(
+    Log.bind(
+      console,
+      `\n%c${ascll[0]} %c ${ascll[1]} %c ${ascll[2]} %c${ascll[3]}%c ${ascll[4]}%c ${ascll[5]}\n\n%c ${ascll[6]}\n`,
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      ""
+    )
+  );
+  setTimeout(
+    Log.bind(
+      console,
+      `%c ${ascll2[0]} %c ${ascll2[1]} %c \n${ascll2[2]} %c\n${ascll2[3]}\n`,
+      "color:white; background-color:#4fd953",
+      "",
+      "",
+      'background:url("https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/tinggge.gif") no-repeat;font-size:450%'
+    )
+  );
+
+  setTimeout(Log.bind(console, "%c WELCOME %c 你好，小笨蛋.", "color:white; background-color:#4f90d9", ""));
+
+  setTimeout(
+    console.warn.bind(
+      console,
+      "%c ⚡ Powered by 安知鱼 %c 你正在访问 长星拓 的博客.",
+      "color:white; background-color:#f0ad4e",
+      ""
+    )
+  );
+
+  setTimeout(Log.bind(console, "%c W23-12 %c 你已打开控制台.", "color:white; background-color:#4f90d9", ""));
+
+  setTimeout(
+    console.warn.bind(console, "%c S013-782 %c 你现在正处于监控中.", "color:white; background-color:#d9534f", "")
+  );
+});</script><script async src="/anzhiyu/random.js"></script><script async="async">(function () {
+  var grt = new Date("05/12/2026 00:00:00"); //设置网站上线时间
+  var now = new Date();
+  var dnum;
+  var hnum;
+  var mnum;
+  var snum;
+  var nowHour;
+
+  // 计算并更新天数、小时数、分钟数和秒数
+  function updateTime() {
+    now = new Date(); // 更新 now 的值
+    nowHour = now.getHours(); // 更新 nowHour 的值
+    var days = (now - grt) / 1000 / 60 / 60 / 24;
+    dnum = Math.floor(days);
+    var hours = (now - grt) / 1000 / 60 / 60 - 24 * dnum;
+    hnum = Math.floor(hours);
+    if (String(hnum).length == 1) {
+      hnum = "0" + hnum;
+    }
+    var minutes = (now - grt) / 1000 / 60 - 24 * 60 * dnum - 60 * hnum;
+    mnum = Math.floor(minutes);
+    if (String(mnum).length == 1) {
+      mnum = "0" + mnum;
+    }
+    var seconds = (now - grt) / 1000 - 24 * 60 * 60 * dnum - 60 * 60 * hnum - 60 * mnum;
+    snum = Math.round(seconds);
+    if (String(snum).length == 1) {
+      snum = "0" + snum;
+    }
+  }
+
+  // 更新网页中显示的网站运行时间
+  function updateHtml() {
+    const footer = document.getElementById("footer");
+    if (!footer) return
+    let currentTimeHtml = "";
+    if (nowHour < 18 && nowHour >= 9) {
+      // 如果是上班时间，默认就是"安知鱼-上班摸鱼中.svg"图片，不需要更改
+      currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+    } else {
+      // 如果是下班时间，插入"安知鱼-下班啦.svg"图片
+      let img = document.querySelector("#workboard .workSituationImg");
+      if (img != null) {
+        img.src = "https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-下班啦.svg";
+        img.title = "休息时间，放松一下~";
+        img.alt = "休息时间，放松一下~";
+      }
+
+      currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+    }
+
+    if (document.getElementById("runtimeTextTip")) {
+      document.getElementById("runtimeTextTip").innerHTML = currentTimeHtml;
+    }
+  }
+
+  setInterval(() => {
+    updateTime();
+    updateHtml();
+  }, 1000);
+})();</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><input type="hidden" name="page-type" id="page-type" value="post"></div><script>var visitorMail = "";
+</script><script async data-pjax src="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/waterfall/waterfall.js"></script><script src="https://cdn.cbd.int/qrcodejs@1.0.0/qrcode.min.js"></script><script src="/js/anzhiyu/right_click_menu.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.9/icon/ali_iconfont_css.css"><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/aplayer/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.cbd.int/anzhiyu-blog-static@1.0.1/js/APlayer.min.js"></script><script src="https://cdn.cbd.int/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js"></script><script src="https://cdn.cbd.int/pjax@0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+  // removeEventListener scroll 
+  anzhiyu.removeGlobalFnEvent('pjax')
+  anzhiyu.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script charset="UTF-8" src="https://cdn.cbd.int/anzhiyu-theme-static@1.1.5/accesskey/accesskey.js"></script></div><div id="popup-window"><div class="popup-window-title">通知</div><div class="popup-window-divider"></div><div class="popup-window-content"><div class="popup-tip">你好呀</div><div class="popup-link"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i></div></div></div></body></html>
